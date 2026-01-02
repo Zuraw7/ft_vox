@@ -1,0 +1,9 @@
+TODO
+Makefile
+CMakeFiles
+CMakeLists.txt
+CMakeCache.txt
+cmake_install.cmake
+cmake-build-debug
+ft_vox
+.idea
