@@ -7,11 +7,14 @@ set(CMAKE_CXX_STANDARD 14)
 add_executable(ft_vox
         src/main.cpp
         src/gl.c
+        src/camera/Camera.cpp
         src/graphics/Shader.cpp
+        src/render/Renderer.cpp
         src/textures/Texture2D.cpp
         src/textures/TextureManager.cpp
-        src/utils/utils.cpp
         src/utils/callbacks.cpp
+        src/utils/declarations.cpp
+        src/utils/utils.cpp
         src/wrappers/wrapGLFW.cpp
         src/wrappers/wrapGLAD.cpp
         include/stb/stb_image.c

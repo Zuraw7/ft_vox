@@ -1,11 +1,17 @@
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 
+#include "camera/Camera.hpp"
 #include "wrappers/wrapGLFW.hpp"
 #include "wrappers/wrapGLAD.hpp"
 #include "graphics/Shader.hpp"
+#include "render/Renderer.hpp"
 #include "textures/TextureManager.hpp"
 #include "utils/declarations.hpp"
+
+Camera gCamera(glm::vec3(0.0f, 0.0f, 1.0f),
+        glm::vec3(0.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f));
 
 int main () {
     Resolution currentRes = HD;
@@ -43,6 +49,8 @@ int main () {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
+    Renderer renderer;
+
     double lastFrame = glfwGetTime();
 
     // Game LOOP
@@ -51,10 +59,11 @@ int main () {
         double deltaTime = thisFrame - lastFrame;
         lastFrame = thisFrame;
 
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        renderer.setBackgroundColor(0.2f, 0.3f, 0.3f, 1.0f);
+        renderer.clear();
 
         shader.bind();
+        renderer.setUniforms(shader);
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         shader.unbind();
