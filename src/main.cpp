@@ -4,6 +4,7 @@
 #include "wrappers/wrapGLFW.hpp"
 #include "wrappers/wrapGLAD.hpp"
 #include "graphics/Shader.hpp"
+#include "textures/TextureManager.hpp"
 #include "utils/declarations.hpp"
 
 int main () {
