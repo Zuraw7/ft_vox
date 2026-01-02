@@ -4,19 +4,13 @@
 #include "wrappers/wrapGLFW.hpp"
 #include "wrappers/wrapGLAD.hpp"
 #include "graphics/Shader.hpp"
-
-void checkGLError()
-{
-    GLenum err;
-    while((err = glGetError()) != GL_NO_ERROR){
-        std::cout << err;
-    }
-}
+#include "utils/declarations.hpp"
 
 int main () {
+    Resolution currentRes = HD;
 
     // Prepare GLFW and GLAD
-    GLFWwindow *window = wrapGLFW::init(1280, 720, "ft_vox");
+    GLFWwindow *window = wrapGLFW::init(currentRes.width, currentRes.height, "ft_vox");
     if (!window)
         return 1;
 
@@ -48,8 +42,13 @@ int main () {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
+    double lastFrame = glfwGetTime();
+
     // Game LOOP
     while (!glfwWindowShouldClose(window)) {
+        double thisFrame = glfwGetTime();
+        double deltaTime = thisFrame - lastFrame;
+        lastFrame = thisFrame;
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

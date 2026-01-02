@@ -21,11 +21,10 @@ namespace wrapGLFW {
         }
 
         glfwMakeContextCurrent(window);
-        int fbWidth, fbHeight;
-        glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
-        glViewport(0, 0, fbWidth, fbHeight);
 
+        glfwSetWindowAspectRatio(window, 16, 9);
         glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+
         glfwSwapInterval(0);
 
         return window;
