@@ -1,19 +1,13 @@
 #ifndef FT_VOX_TEXTURE_HPP
 #define FT_VOX_TEXTURE_HPP
 
-#include "../../include/stb/stb_image.h"
 #include <iostream>
 #include <memory>
-#include <glad/gl.h>
 
 class Texture2D {
 public:
     Texture2D() = default;
-    static std::shared_ptr<Texture2D> create(const std::string &path,
-              int wrapS = GL_MIRRORED_REPEAT,
-              int wrapT = GL_MIRRORED_REPEAT,
-              int minFilter = GL_LINEAR_MIPMAP_LINEAR,
-              int magFilter = GL_LINEAR);
+    static std::shared_ptr<Texture2D> create(const std::string &path);
     Texture2D(const Texture2D &other) = delete;
     Texture2D(Texture2D &&other) noexcept;
 

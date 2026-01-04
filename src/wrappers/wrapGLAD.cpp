@@ -1,5 +1,8 @@
 #include "wrapGLAD.hpp"
-#include <iostream>
+#include <cstdio>
+#include <glad/gl.h>
+#include <GLFW/glfw3.h>
+
 namespace wrapGLAD {
     int init() {
         int version = gladLoadGL(glfwGetProcAddress);

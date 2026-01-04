@@ -1,7 +1,7 @@
 #ifndef FT_VOX_INDEXBUFFER_HPP
 #define FT_VOX_INDEXBUFFER_HPP
+
 #include <vector>
-#include <glad/gl.h>
 #include <cstddef>
 
 class IndexBuffer {

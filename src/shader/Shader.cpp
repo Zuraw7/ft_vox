@@ -1,6 +1,8 @@
+#include "Shader.hpp"
 #include <fstream>
 #include <sstream>
-#include "Shader.hpp"
+#include <glad/gl.h>
+#include <glm/gtc/type_ptr.hpp>
 
 std::string parseShaderFile(const std::string &path) {
     std::ifstream file(path.c_str());

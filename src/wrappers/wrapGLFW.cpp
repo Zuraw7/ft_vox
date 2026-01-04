@@ -1,3 +1,4 @@
+#include <cstdio>
 #include "wrapGLFW.hpp"
 #include "../utils/callbacks.hpp"
 
@@ -22,8 +23,9 @@ namespace wrapGLFW {
 
         glfwMakeContextCurrent(window);
 
+        setCallbacks(window);
         glfwSetWindowAspectRatio(window, 16, 9);
-        glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         glfwSwapInterval(0);
 
@@ -33,5 +35,11 @@ namespace wrapGLFW {
     void exit(GLFWwindow *window) {
         glfwDestroyWindow(window);
         glfwTerminate();
+    }
+
+    void setCallbacks(GLFWwindow *window) {
+        glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+        glfwSetCursorPosCallback(window, cursorPosCallback);
+        glfwSetScrollCallback(window, scrollCallback);
     }
 }

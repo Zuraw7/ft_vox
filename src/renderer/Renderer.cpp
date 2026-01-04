@@ -1,7 +1,7 @@
 #include "Renderer.hpp"
 #include "../camera/Camera.hpp"
-#include "../textures/TextureManager.hpp"
-#include "GLFW/glfw3.h"
+#include "../shader/Shader.hpp"
+#include "glm/ext/matrix_transform.hpp"
 
 extern Camera gCamera;
 

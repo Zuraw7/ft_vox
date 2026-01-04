@@ -1,3 +1,4 @@
+#include <glad/gl.h>
 #include "TextureManager.hpp"
 
 TextureManager::TextureManager() : m_nextSlot(0), m_maxSlots(0) {
@@ -32,12 +33,12 @@ TextureManager & TextureManager::operator=(TextureManager &&other) noexcept {
     return *this;
 }
 
-std::shared_ptr<Texture2D> TextureManager::loadTexture2D(const std::string &path, const int wrapS, const int wrapT, const int minFilter, const int magFilter) {
+std::shared_ptr<Texture2D> TextureManager::loadTexture2D(const std::string &path) {
     const auto it = m_textures2D.find(path);
     if (it != m_textures2D.end())
         return it->second;
 
-    auto tex = Texture2D::create(path, wrapS, wrapT, minFilter, magFilter);
+    auto tex = Texture2D::create(path);
     if (!tex) {
         fprintf(stderr, "Failed to load texture: %s\n", path.c_str());
         return nullptr;

@@ -18,6 +18,7 @@ void Mesh::draw(Shader &shader) const {
     unsigned int diffuseNr = 1;
     unsigned int specularNr = 1;
 
+    // TODO: usunąć? i tak chyba będę tylko korzystać z moich tekstur i obiektów bez tekstur defaultowych
     for (unsigned int i = 0; i < m_textures.size(); i++) {
         glActiveTexture(GL_TEXTURE0 + i);
         std::string number;

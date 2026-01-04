@@ -14,6 +14,7 @@ Camera gCamera(glm::vec3(0.0f, 0.0f, 3.0f),
         glm::vec3(0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f));
 
+
 int main () {
     Resolution currentRes = HD;
 
@@ -31,13 +32,22 @@ int main () {
     Object object("../res/objects/Cube.obj");
     Renderer renderer;
 
-    double lastFrame = glfwGetTime();
+    const char *texturePath = "../res/textures/blocks/bedrock.png";
 
+    TextureManager textureManager;
+    textureManager.loadTexture2D(texturePath);
+
+    textureManager.bindTexture(texturePath);
+    shader.setInt("uTexture", textureManager.getSlot(texturePath));
+
+    double lastFrame = glfwGetTime();
     // Game LOOP
     while (!glfwWindowShouldClose(window)) {
         double thisFrame = glfwGetTime();
         double deltaTime = thisFrame - lastFrame;
         lastFrame = thisFrame;
+
+        processInput(window, renderer, deltaTime);
 
         renderer.setBackgroundColor(0.2f, 0.3f, 0.3f, 1.0f);
         renderer.clear();

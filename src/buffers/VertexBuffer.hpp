@@ -1,7 +1,6 @@
 #ifndef FT_VOX_VERTEXBUFFER_HPP
 #define FT_VOX_VERTEXBUFFER_HPP
 #include <vector>
-#include <glad/gl.h>
 #include <cstddef>
 
 struct Vertex;

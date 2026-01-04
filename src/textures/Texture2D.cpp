@@ -1,7 +1,8 @@
-#include <glad/gl.h>
 #include "Texture2D.hpp"
+#include <glad/gl.h>
+#include "../../include/stb/stb_image.h"
 
-std::shared_ptr<Texture2D> Texture2D::create(const std::string &path, const int wrapS, const int wrapT, const int minFilter, const int magFilter) {
+std::shared_ptr<Texture2D> Texture2D::create(const std::string &path) {
     std::shared_ptr<Texture2D> texture = std::make_shared<Texture2D>();
     texture->m_path = path;
 
@@ -13,11 +14,11 @@ std::shared_ptr<Texture2D> Texture2D::create(const std::string &path, const int 
     glGenTextures(1, &texture->m_id);
     glBindTexture(GL_TEXTURE_2D, texture->m_id);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapS);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     const int format = (texture->m_nrChannels == 4) ? GL_RGBA : GL_RGB;
     glTexImage2D(GL_TEXTURE_2D, 0, format, texture->m_width, texture->m_height, 0, format, GL_UNSIGNED_BYTE, data);

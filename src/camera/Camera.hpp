@@ -1,8 +1,6 @@
 #ifndef FT_VOX_CAMERA_HPP
 #define FT_VOX_CAMERA_HPP
 
-#include <iostream>
-#include <array>
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 

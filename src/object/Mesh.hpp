@@ -11,9 +11,6 @@
 #include "../buffers/IndexBuffer.hpp"
 
 class Shader;
-class VertexArray;
-class VertexBuffer;
-class IndexBuffer;
 
 struct Vertex {
     glm::vec3 position;

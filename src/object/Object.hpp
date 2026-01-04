@@ -1,11 +1,9 @@
 #ifndef FT_VOX_OBJECT_HPP
 #define FT_VOX_OBJECT_HPP
 
-#include <iostream>
 #include <vector>
 #include <assimp/mesh.h>
 #include <assimp/scene.h>
-
 #include "Mesh.hpp"
 
 class Shader;

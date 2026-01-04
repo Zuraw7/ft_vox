@@ -1,3 +1,4 @@
+#include <glad/gl.h>
 #include "VertexBuffer.hpp"
 #include "../object/Mesh.hpp"
 

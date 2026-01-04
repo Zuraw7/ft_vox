@@ -1,4 +1,5 @@
 #include "IndexBuffer.hpp"
+#include <glad/gl.h>
 
 IndexBuffer::IndexBuffer(const unsigned int *indices, const size_t size) : m_id(0) {
     glGenBuffers(1, &m_id);

@@ -1,6 +1,5 @@
 #ifndef FT_VOX_VERTEXARRAY_HPP
 #define FT_VOX_VERTEXARRAY_HPP
-#include <glad/gl.h>
 
 class VertexArray {
 public:

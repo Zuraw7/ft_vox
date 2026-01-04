@@ -1,12 +1,9 @@
 #ifndef FT_VOX_SHADER_HPP
 #define FT_VOX_SHADER_HPP
 #include <iostream>
-#include <array>
 #include <unordered_map>
-#include <glad/gl.h>
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 class Shader {
 public:

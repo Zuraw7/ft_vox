@@ -18,6 +18,7 @@ add_executable(ft_vox
         src/utils/callbacks.cpp
         src/utils/declarations.cpp
         src/utils/utils.cpp
+        src/utils/inputManagement.cpp
         src/wrappers/wrapGLFW.cpp
         src/wrappers/wrapGLAD.cpp
         src/object/Mesh.cpp

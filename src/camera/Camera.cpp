@@ -1,9 +1,8 @@
 #include "Camera.hpp"
-
+#include <iostream>
 #include <cmath>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
-
 #include "../utils/declarations.hpp"
 
 Camera::Camera(const glm::vec3 position, const glm::vec3 target, const glm::vec3 worldUp) : m_camPosition(position), m_targetPos(target), m_worldUp(worldUp), m_yaw(-90.0f), m_pitch(0.0f), m_speed(1.0f), m_fov(80.0f) {
