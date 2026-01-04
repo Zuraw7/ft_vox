@@ -1,5 +1,5 @@
-#ifndef SCOP_SHADER_HPP
-#define SCOP_SHADER_HPP
+#ifndef FT_VOX_SHADER_HPP
+#define FT_VOX_SHADER_HPP
 #include <iostream>
 #include <array>
 #include <unordered_map>
@@ -38,4 +38,4 @@ private:
 };
 
 
-#endif //SCOP_SHADER_HPP
+#endif //FT_VOX_SHADER_HPP

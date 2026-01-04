@@ -2,7 +2,7 @@
 #define FT_VOX_RENDERER_HPP
 
 // #include "../core/Object.hpp"
-#include "../graphics/Shader.hpp"
+#include "../shader/Shader.hpp"
 
 // class Object;
 

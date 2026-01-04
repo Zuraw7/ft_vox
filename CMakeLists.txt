@@ -8,8 +8,11 @@ add_executable(ft_vox
         src/main.cpp
         src/gl.c
         src/camera/Camera.cpp
-        src/graphics/Shader.cpp
-        src/render/Renderer.cpp
+        src/shader/Shader.cpp
+        src/buffers/VertexArray.cpp
+        src/buffers/VertexBuffer.cpp
+        src/buffers/IndexBuffer.cpp
+        src/renderer/Renderer.cpp
         src/textures/Texture2D.cpp
         src/textures/TextureManager.cpp
         src/utils/callbacks.cpp
@@ -17,7 +20,11 @@ add_executable(ft_vox
         src/utils/utils.cpp
         src/wrappers/wrapGLFW.cpp
         src/wrappers/wrapGLAD.cpp
+        src/object/Mesh.cpp
+        src/object/Mesh.hpp
         include/stb/stb_image.c
+        src/object/Object.cpp
+        src/object/Object.hpp
 )
 
 target_include_directories(ft_vox
@@ -26,6 +33,7 @@ target_include_directories(ft_vox
 )
 
 find_package(OpenGL REQUIRED)
+find_package(ZLIB REQUIRED)
 
 add_library(glfw3 STATIC IMPORTED)
 set_target_properties(glfw3 PROPERTIES
@@ -42,4 +50,5 @@ target_link_libraries(ft_vox
         glfw3
         OpenGL::GL
         assimp
+        ZLIB::ZLIB
 )

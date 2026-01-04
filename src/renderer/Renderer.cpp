@@ -1,6 +1,7 @@
 #include "Renderer.hpp"
 #include "../camera/Camera.hpp"
 #include "../textures/TextureManager.hpp"
+#include "GLFW/glfw3.h"
 
 extern Camera gCamera;
 
@@ -32,6 +33,9 @@ void Renderer::setUniforms(/*std::unique_ptr<Object> &object,*/ Shader &shader) 
     // shader.setUniformMatrix4fv("uModel", object->getMatrix());
 
     glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 1, 0));
+    model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
     shader.setUniformMatrix4fv("uModel", model);
     shader.setUniformMatrix4fv("uView", gCamera.getCamView());
     shader.setUniformMatrix4fv("uProjection", gCamera.getCamProjection());

@@ -4,12 +4,13 @@
 #include "camera/Camera.hpp"
 #include "wrappers/wrapGLFW.hpp"
 #include "wrappers/wrapGLAD.hpp"
-#include "graphics/Shader.hpp"
-#include "render/Renderer.hpp"
+#include "shader/Shader.hpp"
+#include "renderer/Renderer.hpp"
 #include "textures/TextureManager.hpp"
 #include "utils/declarations.hpp"
+#include "object/Object.hpp"
 
-Camera gCamera(glm::vec3(0.0f, 0.0f, 1.0f),
+Camera gCamera(glm::vec3(0.0f, 0.0f, 3.0f),
         glm::vec3(0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f));
 
@@ -27,28 +28,7 @@ int main () {
     }
 
     Shader shader("../res/shaders/vertex.shader", "../res/shaders/fragment.shader");
-
-    float vertices[] {
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.0f,  0.5f, 0.0f
-    };
-
-    unsigned int VBO, VAO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
-    glEnableVertexAttribArray(0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-
+    Object object("../res/objects/Cube.obj");
     Renderer renderer;
 
     double lastFrame = glfwGetTime();
@@ -62,18 +42,13 @@ int main () {
         renderer.setBackgroundColor(0.2f, 0.3f, 0.3f, 1.0f);
         renderer.clear();
 
-        shader.bind();
         renderer.setUniforms(shader);
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-        shader.unbind();
+        object.draw(shader);
 
         glfwSwapBuffers(window);
 
         glfwPollEvents();
     }
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
 
     // Cleanup
     wrapGLFW::exit(window);

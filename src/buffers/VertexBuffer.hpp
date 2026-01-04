@@ -1,5 +1,5 @@
-#ifndef SCOP_VERTEXBUFFER_HPP
-#define SCOP_VERTEXBUFFER_HPP
+#ifndef FT_VOX_VERTEXBUFFER_HPP
+#define FT_VOX_VERTEXBUFFER_HPP
 #include <vector>
 #include <glad/gl.h>
 #include <cstddef>
@@ -27,4 +27,4 @@ private:
 };
 
 
-#endif //SCOP_VERTEXBUFFER_HPP
+#endif //FT_VOX_VERTEXBUFFER_HPP

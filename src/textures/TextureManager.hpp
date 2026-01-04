@@ -1,5 +1,5 @@
-#ifndef SCOP_TEXTUREMANAGER_HPP
-#define SCOP_TEXTUREMANAGER_HPP
+#ifndef FT_VOX_TEXTUREMANAGER_HPP
+#define FT_VOX_TEXTUREMANAGER_HPP
 
 #include <memory>
 #include <string>
@@ -33,4 +33,4 @@ private:
 };
 
 
-#endif //SCOP_TEXTUREMANAGER_HPP
+#endif //FT_VOX_TEXTUREMANAGER_HPP

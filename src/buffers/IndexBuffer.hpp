@@ -1,5 +1,5 @@
-#ifndef SCOP_INDEXBUFFER_HPP
-#define SCOP_INDEXBUFFER_HPP
+#ifndef FT_VOX_INDEXBUFFER_HPP
+#define FT_VOX_INDEXBUFFER_HPP
 #include <vector>
 #include <glad/gl.h>
 #include <cstddef>
@@ -24,4 +24,4 @@ private:
 };
 
 
-#endif //SCOP_INDEXBUFFER_HPP
+#endif //FT_VOX_INDEXBUFFER_HPP

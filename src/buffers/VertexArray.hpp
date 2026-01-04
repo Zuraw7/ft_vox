@@ -1,5 +1,5 @@
-#ifndef SCOP_VERTEXARRAY_HPP
-#define SCOP_VERTEXARRAY_HPP
+#ifndef FT_VOX_VERTEXARRAY_HPP
+#define FT_VOX_VERTEXARRAY_HPP
 #include <glad/gl.h>
 
 class VertexArray {
@@ -20,4 +20,4 @@ private:
 };
 
 
-#endif //SCOP_VERTEXARRAY_HPP
+#endif //FT_VOX_VERTEXARRAY_HPP

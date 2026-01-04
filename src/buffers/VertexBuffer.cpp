@@ -1,5 +1,5 @@
 #include "VertexBuffer.hpp"
-#include "../core/Object.hpp"
+#include "../object/Mesh.hpp"
 
 VertexBuffer::VertexBuffer(const float *vertices, const size_t size) : m_id(0) {
     glGenBuffers(1, &m_id);

@@ -1,5 +1,5 @@
-#ifndef SCOP_TEXTURE_HPP
-#define SCOP_TEXTURE_HPP
+#ifndef FT_VOX_TEXTURE_HPP
+#define FT_VOX_TEXTURE_HPP
 
 #include "../../include/stb/stb_image.h"
 #include <iostream>
@@ -33,4 +33,4 @@ private:
 };
 
 
-#endif //SCOP_TEXTURE_HPP
+#endif //FT_VOX_TEXTURE_HPP
