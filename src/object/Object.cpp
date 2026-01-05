@@ -2,16 +2,23 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <glm/detail/type_vec4.hpp>
-#include <stb/stb_image.h>
 #include <glm/ext/matrix_transform.hpp>
+#include <stb/stb_image.h>
+#include "../shader/Shader.hpp"
+#include "../textures/TextureManager.hpp"
+
+extern std::unique_ptr<TextureManager> gTextureManager;
 
 Object::Object(const char *path) : m_model(glm::mat4(1.0f)) {
-    m_model = glm::scale(m_model, glm::vec3(0.5f));
     loadModel(path);
 }
 
 void Object::draw(Shader &shader) const {
     for (const auto &mesh : m_meshes) {
+        const unsigned int slot = gTextureManager->getSlot(m_texture);
+        gTextureManager->bindTexture(m_texture);
+        shader.setInt("uTexture", slot);
+
         mesh.draw(shader);
     }
 }

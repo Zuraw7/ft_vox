@@ -29,15 +29,47 @@ int main () {
         return 1;
     }
 
+    std::string texturePath[] = {
+        "../res/textures/blocks/bedrock.png",
+        "../res/textures/blocks/brick.png",
+        "../res/textures/blocks/ice.png",
+        "../res/textures/blocks/diamond_ore.png",
+        "../res/textures/blocks/bookshelf.png",
+        "../res/textures/blocks/dirt.png",
+    };
+
     gTextureManager = std::make_unique<TextureManager>();
-    std::string texturePath = "../res/textures/blocks/bedrock.png";
-    gTextureManager->loadTexture2D(texturePath);
+    for (const auto &path: texturePath) {
+        gTextureManager->loadTexture2D(path);
+    }
 
     Shader shader("../res/shaders/vertex.shader", "../res/shaders/fragment.shader");
 
-    std::unique_ptr<Object> object = std::make_unique<Object>("../res/objects/Cube.obj");
-    object->setWorldPosition(glm::vec3(1.0f, 1.0f, 1.0f));
-    object->setTexture(texturePath);
+    std::vector<std::unique_ptr<Object>> objects;
+
+    objects.push_back(std::make_unique<Object>("../res/objects/Cube.obj"));
+    objects.at(objects.size() - 1)->setWorldPosition(glm::vec3(1.0f, 1.0f, 1.0f));
+    objects.at(objects.size() - 1)->setTexture(texturePath[0]);
+
+    objects.push_back(std::make_unique<Object>("../res/objects/Cube.obj"));
+    objects.at(objects.size() - 1)->setWorldPosition(glm::vec3(-1.0f, 1.0f, 1.0f));
+    objects.at(objects.size() - 1)->setTexture(texturePath[1]);
+
+    objects.push_back(std::make_unique<Object>("../res/objects/Cube.obj"));
+    objects.at(objects.size() - 1)->setWorldPosition(glm::vec3(-1.0f, 3.0f, 1.0f));
+    objects.at(objects.size() - 1)->setTexture(texturePath[2]);
+
+    objects.push_back(std::make_unique<Object>("../res/objects/Cube.obj"));
+    objects.at(objects.size() - 1)->setWorldPosition(glm::vec3(1.0f, 3.0f, 1.0f));
+    objects.at(objects.size() - 1)->setTexture(texturePath[3]);
+
+    objects.push_back(std::make_unique<Object>("../res/objects/Cube.obj"));
+    objects.at(objects.size() - 1)->setWorldPosition(glm::vec3(-1.0f, -1.0f, 1.0f));
+    objects.at(objects.size() - 1)->setTexture(texturePath[4]);
+
+    objects.push_back(std::make_unique<Object>("../res/objects/Cube.obj"));
+    objects.at(objects.size() - 1)->setWorldPosition(glm::vec3(1.0f, -1.0f, 1.0f));
+    objects.at(objects.size() - 1)->setTexture(texturePath[5]);
 
     Renderer renderer;
 
@@ -53,7 +85,9 @@ int main () {
         renderer.setBackgroundColor(0.2f, 0.3f, 0.3f, 1.0f);
         renderer.clear();
 
-        renderer.draw(object, shader, deltaTime);
+        for (auto &object: objects) {
+            renderer.draw(object, shader, deltaTime);
+        }
 
         glfwSwapBuffers(window);
 

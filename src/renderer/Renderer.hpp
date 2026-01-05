@@ -13,7 +13,7 @@ public:
     void draw(std::unique_ptr<Object> &object, Shader& shader, float deltaTime) const;
 
 private:
-    void setUniforms(std::unique_ptr<Object> &object, Shader& shader) const;
+    void setUniforms(const std::unique_ptr<Object> &object, Shader& shader) const;
 };
 
 #endif //FT_VOX_RENDERER_HPP

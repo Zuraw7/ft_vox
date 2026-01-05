@@ -29,11 +29,8 @@ void Renderer::draw(std::unique_ptr<Object> &object, Shader &shader, float delta
     shader.unbind();
 }
 
-void Renderer::setUniforms(std::unique_ptr<Object> &object, Shader &shader) const {
+void Renderer::setUniforms(const std::unique_ptr<Object> &object, Shader &shader) const {
     shader.setUniformMatrix4fv("uModel", object->getModel());
     shader.setUniformMatrix4fv("uView", gCamera.getCamView());
     shader.setUniformMatrix4fv("uProjection", gCamera.getCamProjection());
-
-    gTextureManager->bindTexture(object->getTexture());
-    shader.setInt("aTexture", gTextureManager->getSlot(object->getTexture()));
 }
