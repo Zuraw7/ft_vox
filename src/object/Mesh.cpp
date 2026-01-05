@@ -15,27 +15,8 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
 }
 
 void Mesh::draw(Shader &shader) const {
-    unsigned int diffuseNr = 1;
-    unsigned int specularNr = 1;
-
-    // TODO: usunąć? i tak chyba będę tylko korzystać z moich tekstur i obiektów bez tekstur defaultowych
-    for (unsigned int i = 0; i < m_textures.size(); i++) {
-        glActiveTexture(GL_TEXTURE0 + i);
-        std::string number;
-        std::string name = m_textures[i].type;
-        if (name == "texture_diffuse")
-            number = std::to_string(diffuseNr++);
-        else if (name == "texture_specular")
-            number = std::to_string(specularNr++);
-
-        shader.setInt(("material." + name + number), i);
-        glBindTexture(GL_TEXTURE_2D, m_textures[i].id);
-    }
-
-    glActiveTexture(GL_TEXTURE0);
-
     m_VAO->bind();
-    glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, nullptr);
     m_VAO->unbind();
 }
 

@@ -14,6 +14,7 @@ Camera gCamera(glm::vec3(0.0f, 0.0f, 3.0f),
         glm::vec3(0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f));
 
+std::unique_ptr<TextureManager> gTextureManager;
 
 int main () {
     Resolution currentRes = HD;
@@ -28,17 +29,17 @@ int main () {
         return 1;
     }
 
+    gTextureManager = std::make_unique<TextureManager>();
+    std::string texturePath = "../res/textures/blocks/bedrock.png";
+    gTextureManager->loadTexture2D(texturePath);
+
     Shader shader("../res/shaders/vertex.shader", "../res/shaders/fragment.shader");
-    Object object("../res/objects/Cube.obj");
+
+    std::unique_ptr<Object> object = std::make_unique<Object>("../res/objects/Cube.obj");
+    object->setWorldPosition(glm::vec3(1.0f, 1.0f, 1.0f));
+    object->setTexture(texturePath);
+
     Renderer renderer;
-
-    const char *texturePath = "../res/textures/blocks/bedrock.png";
-
-    TextureManager textureManager;
-    textureManager.loadTexture2D(texturePath);
-
-    textureManager.bindTexture(texturePath);
-    shader.setInt("uTexture", textureManager.getSlot(texturePath));
 
     double lastFrame = glfwGetTime();
     // Game LOOP
@@ -52,8 +53,7 @@ int main () {
         renderer.setBackgroundColor(0.2f, 0.3f, 0.3f, 1.0f);
         renderer.clear();
 
-        renderer.setUniforms(shader);
-        object.draw(shader);
+        renderer.draw(object, shader, deltaTime);
 
         glfwSwapBuffers(window);
 

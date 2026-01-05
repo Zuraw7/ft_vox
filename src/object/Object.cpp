@@ -3,11 +3,13 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <glm/detail/type_vec4.hpp>
-#include "../../include/stb/stb_image.h"
+#include <stb/stb_image.h>
+#include <glm/ext/matrix_transform.hpp>
 
 unsigned int TextureFromFile(const char *path, const std::string &directory);
 
-Object::Object(const char *path) {
+Object::Object(const char *path) : m_model(glm::mat4(1.0f)) {
+    m_model = glm::scale(m_model, glm::vec3(0.5f));
     loadModel(path);
 }
 
@@ -15,6 +17,22 @@ void Object::draw(Shader &shader) const {
     for (const auto &mesh : m_meshes) {
         mesh.draw(shader);
     }
+}
+
+void Object::setWorldPosition(const glm::vec3 &worldPos) {
+    m_model = glm::translate(m_model, worldPos);
+}
+
+glm::mat4 &Object::getModel() {
+    return m_model;
+}
+
+std::string & Object::getTexture() {
+    return m_texture;
+}
+
+void Object::setTexture(const std::string &texturePath) {
+    m_texture = texturePath;
 }
 
 void Object::loadModel(const std::string &path) {
