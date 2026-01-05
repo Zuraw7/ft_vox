@@ -19,18 +19,21 @@ public:
     glm::mat4 &getModel();
     std::string &getTexture();
 
-    void setWorldPosition(const glm::vec3 &worldPos);
+    void setPosition(const glm::vec3 &pos);
     void setTexture(const std::string &texturePath);
+    void setScale(glm::vec3 scale);
 
 private:
     std::vector<Mesh> m_meshes;
-    std::string m_directory;
-    glm::mat4 m_model;
     std::string m_texture;
+    glm::mat4 m_model;
+    glm::vec3 m_position;
+    glm::vec3 m_scale;
 
     void loadModel(const std::string &path);
     void processNode(const aiNode *node, const aiScene *scene);
     Mesh processMesh(aiMesh *mesh, const aiScene *scene);
+    void updateModelMatrix();
 };
 
 

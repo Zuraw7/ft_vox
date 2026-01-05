@@ -9,8 +9,9 @@
 
 extern std::unique_ptr<TextureManager> gTextureManager;
 
-Object::Object(const char *path) : m_model(glm::mat4(1.0f)) {
+Object::Object(const char *path) : m_model(glm::mat4(1.0f)), m_position(glm::vec3(0.0f)), m_scale(glm::vec3(1.0f)) {
     loadModel(path);
+    updateModelMatrix();
 }
 
 void Object::draw(Shader &shader) const {
@@ -23,8 +24,9 @@ void Object::draw(Shader &shader) const {
     }
 }
 
-void Object::setWorldPosition(const glm::vec3 &worldPos) {
-    m_model = glm::translate(m_model, worldPos);
+void Object::setPosition(const glm::vec3 &pos) {
+    m_position = pos;
+    updateModelMatrix();
 }
 
 glm::mat4 &Object::getModel() {
@@ -39,6 +41,11 @@ void Object::setTexture(const std::string &texturePath) {
     m_texture = texturePath;
 }
 
+void Object::setScale(const glm::vec3 scale) {
+    m_scale = scale;
+    updateModelMatrix();
+}
+
 void Object::loadModel(const std::string &path) {
     Assimp::Importer importer;
     const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
@@ -48,7 +55,6 @@ void Object::loadModel(const std::string &path) {
         return;
     }
 
-    m_directory = path.substr(0, path.find_last_of('/'));
     processNode(scene->mRootNode, scene);
 }
 
@@ -101,4 +107,10 @@ Mesh Object::processMesh(aiMesh *mesh, const aiScene *scene) {
     }
 
     return Mesh(vertices, indices);
+}
+
+void Object::updateModelMatrix() {
+    m_model = glm::mat4(1.0f);
+    m_model = glm::translate(m_model, m_position);
+    m_model = glm::scale(m_model, m_scale);
 }

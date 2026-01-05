@@ -10,14 +10,14 @@
 #include "utils/declarations.hpp"
 #include "object/Object.hpp"
 
-Camera gCamera(glm::vec3(0.0f, 0.0f, 3.0f),
+Camera gCamera(glm::vec3(0.0f, 1.0f, 3.0f),
         glm::vec3(0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f));
 
 std::unique_ptr<TextureManager> gTextureManager;
 
 int main () {
-    Resolution currentRes = HD;
+    Resolution currentRes = FHD;
 
     // Prepare GLFW and GLAD
     GLFWwindow *window = wrapGLFW::init(currentRes.width, currentRes.height, "ft_vox");
@@ -48,28 +48,34 @@ int main () {
     std::vector<std::unique_ptr<Object>> objects;
 
     objects.push_back(std::make_unique<Object>("../res/objects/Cube.obj"));
-    objects.at(objects.size() - 1)->setWorldPosition(glm::vec3(1.0f, 1.0f, 1.0f));
+    objects.at(objects.size() - 1)->setPosition(glm::vec3(1.0f, 1.0f, 1.0f));
     objects.at(objects.size() - 1)->setTexture(texturePath[0]);
+    objects.at(objects.size() - 1)->setScale(glm::vec3(0.5f));
 
     objects.push_back(std::make_unique<Object>("../res/objects/Cube.obj"));
-    objects.at(objects.size() - 1)->setWorldPosition(glm::vec3(-1.0f, 1.0f, 1.0f));
+    objects.at(objects.size() - 1)->setPosition(glm::vec3(0.0f, 1.0f, 1.0f));
     objects.at(objects.size() - 1)->setTexture(texturePath[1]);
+    objects.at(objects.size() - 1)->setScale(glm::vec3(0.5f));
 
     objects.push_back(std::make_unique<Object>("../res/objects/Cube.obj"));
-    objects.at(objects.size() - 1)->setWorldPosition(glm::vec3(-1.0f, 3.0f, 1.0f));
+    objects.at(objects.size() - 1)->setPosition(glm::vec3(0.0f, 2.0f, 1.0f));
     objects.at(objects.size() - 1)->setTexture(texturePath[2]);
+    objects.at(objects.size() - 1)->setScale(glm::vec3(0.5f));
 
     objects.push_back(std::make_unique<Object>("../res/objects/Cube.obj"));
-    objects.at(objects.size() - 1)->setWorldPosition(glm::vec3(1.0f, 3.0f, 1.0f));
+    objects.at(objects.size() - 1)->setPosition(glm::vec3(1.0f, 2.0f, 1.0f));
     objects.at(objects.size() - 1)->setTexture(texturePath[3]);
+    objects.at(objects.size() - 1)->setScale(glm::vec3(0.5f));
 
     objects.push_back(std::make_unique<Object>("../res/objects/Cube.obj"));
-    objects.at(objects.size() - 1)->setWorldPosition(glm::vec3(-1.0f, -1.0f, 1.0f));
+    objects.at(objects.size() - 1)->setPosition(glm::vec3(0.0f, 0.0f, 1.0f));
     objects.at(objects.size() - 1)->setTexture(texturePath[4]);
+    objects.at(objects.size() - 1)->setScale(glm::vec3(0.5f));
 
     objects.push_back(std::make_unique<Object>("../res/objects/Cube.obj"));
-    objects.at(objects.size() - 1)->setWorldPosition(glm::vec3(1.0f, -1.0f, 1.0f));
+    objects.at(objects.size() - 1)->setPosition(glm::vec3(1.0f, 0.0f, 1.0f));
     objects.at(objects.size() - 1)->setTexture(texturePath[5]);
+    objects.at(objects.size() - 1)->setScale(glm::vec3(0.5f));
 
     Renderer renderer;
 
@@ -88,7 +94,6 @@ int main () {
         for (auto &object: objects) {
             renderer.draw(object, shader, deltaTime);
         }
-
         glfwSwapBuffers(window);
 
         glfwPollEvents();
