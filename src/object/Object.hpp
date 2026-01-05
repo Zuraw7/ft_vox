@@ -13,7 +13,14 @@ class Mesh;
 
 class Object {
 public:
+
     Object(const char *path);
+    Object(Object &&other) noexcept;
+    Object(const Object &other) = delete;
+
+    Object &operator=(Object &&other) noexcept;
+    Object &operator=(const Object &other) = delete;
+
     void draw(Shader &shader) const;
 
     glm::mat4 &getModel();

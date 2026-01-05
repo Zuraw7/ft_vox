@@ -14,6 +14,25 @@ Object::Object(const char *path) : m_model(glm::mat4(1.0f)), m_position(glm::vec
     updateModelMatrix();
 }
 
+Object::Object(Object &&other) noexcept : m_meshes(std::move(other.m_meshes)),
+          m_texture(std::move(other.m_texture)),
+          m_model(std::move(other.m_model)),
+          m_position(std::move(other.m_position)),
+          m_scale(std::move(other.m_scale)){
+
+}
+
+Object &Object::operator=(Object &&other) noexcept {
+    if (this == &other)
+        return *this;
+    m_meshes = std::move(other.m_meshes);
+    m_texture = std::move(other.m_texture);
+    m_model = std::move(other.m_model);
+    m_position = std::move(other.m_position);
+    m_scale = std::move(other.m_scale);
+    return *this;
+}
+
 void Object::draw(Shader &shader) const {
     for (const auto &mesh : m_meshes) {
         const unsigned int slot = gTextureManager->getSlot(m_texture);
