@@ -24,7 +24,6 @@ public:
 
 private:
     std::vector<Mesh> m_meshes;
-    std::vector<Texture> m_loadedTextures;
     std::string m_directory;
     glm::mat4 m_model;
     std::string m_texture;
@@ -32,7 +31,6 @@ private:
     void loadModel(const std::string &path);
     void processNode(const aiNode *node, const aiScene *scene);
     Mesh processMesh(aiMesh *mesh, const aiScene *scene);
-    std::vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, const std::string &typeName);
 };
 
 

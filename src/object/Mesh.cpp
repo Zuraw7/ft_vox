@@ -6,10 +6,9 @@
 #include <utility>
 #include <glad/gl.h>
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures) {
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices) {
     m_vertices = std::move(vertices);
     m_indices = std::move(indices);
-    m_textures = std::move(textures);
 
     setupMesh();
 }
@@ -24,6 +23,8 @@ void Mesh::setupMesh() {
     m_VAO = std::make_unique<VertexArray>(VertexArray());
     m_VBO = std::make_unique<VertexBuffer>(VertexBuffer(m_vertices));
     m_EBO = std::make_unique<IndexBuffer>(IndexBuffer(m_indices));
+
+    m_VAO->bind();
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), nullptr);
