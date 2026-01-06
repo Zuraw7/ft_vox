@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 
 #include "camera/Camera.hpp"
+#include "chunk/Chunk.hpp"
 #include "wrappers/wrapGLFW.hpp"
 #include "wrappers/wrapGLAD.hpp"
 #include "shader/Shader.hpp"
@@ -10,23 +11,11 @@
 #include "utils/declarations.hpp"
 #include "object/Object.hpp"
 
-Camera gCamera(glm::vec3(0.0f, 1.0f, 3.0f),
+Camera gCamera(glm::vec3(0.0f, 0.0f, 3.0f),
         glm::vec3(0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f));
 
 std::unique_ptr<TextureManager> gTextureManager;
-
-void createPlatform(std::vector<std::unique_ptr<Object>> &objects, std::string &tex) {
-    for (int i = -25; i < 25; i++) {
-        for (int j = -25; j < 25; j++) {
-            std::unique_ptr<Object> object = std::make_unique<Object>("../res/objects/Cube.obj");
-            object->setTexture(tex);
-            object->setScale(glm::vec3(0.5f));
-            object->setPosition(glm::vec3(i, 0, j));
-            objects.emplace_back(std::move(object));
-        }
-    }
-}
 
 int main () {
     Resolution currentRes = HD;
@@ -42,12 +31,12 @@ int main () {
     }
 
     std::string texturePath[] = {
+        "../res/textures/blocks/dirt.png",
+        "../res/textures/blocks/stone.png",
         "../res/textures/blocks/bedrock.png",
         "../res/textures/blocks/brick.png",
-        "../res/textures/blocks/ice.png",
         "../res/textures/blocks/diamond_ore.png",
         "../res/textures/blocks/bookshelf.png",
-        "../res/textures/blocks/dirt.png",
     };
 
     gTextureManager = std::make_unique<TextureManager>();
@@ -57,12 +46,19 @@ int main () {
 
     Shader shader("../res/shaders/vertex.shader", "../res/shaders/fragment.shader");
 
-    std::vector<std::unique_ptr<Object>> objects;
-    createPlatform(objects, texturePath[5]);
-    objects.emplace_back(std::make_unique<Object>("../res/objects/Cube.obj"));
-    objects.at(objects.size() - 1)->setTexture(texturePath[4]);
-    objects.at(objects.size() - 1)->setScale(glm::vec3(0.5f));
-    objects.at(objects.size() - 1)->setPosition(glm::vec3(1.0f));
+    // std::vector<std::unique_ptr<Object>> objects;
+    // objects.emplace_back(std::make_unique<Object>("../res/objects/Cube.obj"));
+    // objects.at(objects.size() - 1)->setTexture(texturePath[2]);
+    // objects.at(objects.size() - 1)->setScale(glm::vec3(0.5f));
+    // objects.at(objects.size() - 1)->setPosition(glm::vec3(1.0f));
+
+    Chunk chunk({5, -8, 0});
+    Chunk chunk2({5, -8, 16});
+    Chunk chunk3({5, -8, 32});
+
+    chunk.uploadMesh();
+    chunk2.uploadMesh();
+    chunk3.uploadMesh();
 
     Renderer renderer;
 
@@ -78,12 +74,20 @@ int main () {
         renderer.setBackgroundColor(0.2f, 0.3f, 0.3f, 1.0f);
         renderer.clear();
 
-        for (auto &object: objects) {
-            renderer.draw(object, shader, deltaTime);
-        }
+        shader.setUniformMatrix4fv("uView", gCamera.getCamView());
+        shader.setUniformMatrix4fv("uProjection", gCamera.getCamProjection());
+
+        chunk.draw(shader);
+        chunk2.draw(shader);
+        chunk3.draw(shader);
+
+        // for (auto &object: objects) {
+        //     renderer.draw(object, shader, deltaTime);
+        // }
 
         glfwSwapBuffers(window);
 
+        fprintf(stdout, "FPS: %f\n", 1.0 / deltaTime);
         glfwPollEvents();
     }
 
