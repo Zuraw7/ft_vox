@@ -23,6 +23,11 @@ void Renderer::draw(std::unique_ptr<Object> &object, Shader &shader, float delta
 
     shader.bind();
 
+    unsigned int mode = GL_FILL;
+    if (gCamera.getPolygonMode())
+        mode = GL_LINE;
+    glPolygonMode(GL_FRONT_AND_BACK, mode);
+
     setUniforms(object, shader);
     object->draw(shader);
 

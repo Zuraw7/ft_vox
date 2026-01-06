@@ -5,7 +5,7 @@
 #include <glm/ext/matrix_transform.hpp>
 #include "../utils/declarations.hpp"
 
-Camera::Camera(const glm::vec3 position, const glm::vec3 target, const glm::vec3 worldUp) : m_camPosition(position), m_targetPos(target), m_worldUp(worldUp), m_yaw(-90.0f), m_pitch(0.0f), m_speed(3.0f), m_fov(80.0f) {
+Camera::Camera(const glm::vec3 position, const glm::vec3 target, const glm::vec3 worldUp) : m_camPosition(position), m_targetPos(target), m_worldUp(worldUp), m_yaw(-90.0f), m_pitch(0.0f), m_speed(3.0f), m_fov(80.0f), m_polygonMode(false) {
     updateCameraVectors();
     m_view = lookAt();
     m_projection = glm::perspective(glm::radians(m_fov), Resolution::aspect, NEAR, FAR);
@@ -22,6 +22,10 @@ const glm::mat4 &Camera::getCamProjection() const {
 
 const glm::vec3 & Camera::getPosition() const {
     return m_camPosition;
+}
+
+bool Camera::getPolygonMode() const {
+    return m_polygonMode;
 }
 
 void Camera::updateCameraDirection(double dx, double dy) {
@@ -82,6 +86,10 @@ void Camera::updateCameraVectors() {
     m_camDirection = glm::normalize(direction);
     m_camRight = glm::normalize(glm::cross(m_camDirection, m_worldUp));
     m_camUp = glm::normalize(glm::cross( m_camRight, m_camDirection));
+}
+
+void Camera::switchPolygonMode() {
+    m_polygonMode = !m_polygonMode;
 }
 
 glm::mat4 Camera::lookAt() const {

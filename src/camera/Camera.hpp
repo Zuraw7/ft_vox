@@ -35,10 +35,13 @@ public:
     const glm::mat4 &getCamProjection() const;
     const glm::vec3 &getPosition() const;
 
+    bool getPolygonMode() const;
+
     void updateCameraDirection(double dx, double dy);
     void updateCameraPos(CameraDirection dir, double deltaTime);
     void updateCameraZoom(double dy);
     void updateCameraVectors();
+    void switchPolygonMode();
 
 private:
     // Vectors
@@ -58,6 +61,8 @@ private:
     float m_pitch;
     float m_speed;
     float m_fov;
+
+    bool m_polygonMode;
 
     glm::mat4 lookAt() const;
 };
