@@ -27,6 +27,12 @@ static void moveCamera(GLFWwindow *window, double deltaTime) {
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
         gCamera.updateCameraPos(CameraDirection::RIGHT, deltaTime);
     }
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+        gCamera.updateCameraPos(CameraDirection::UP, deltaTime);
+    }
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+        gCamera.updateCameraPos(CameraDirection::DOWN, deltaTime);
+    }
 }
 
 

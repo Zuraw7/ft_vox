@@ -4,6 +4,8 @@
 #include "../perlinNoise/PerlinNoise.hpp"
 #include <glm/ext/matrix_transform.hpp>
 
+#define WORLD_MAX_HEIGHT 256
+
 extern std::unique_ptr<PerlinNoise> gPerlinNoise;
 
 enum class FaceDirection {
@@ -18,22 +20,41 @@ enum class FaceDirection {
 void addFace(std::vector<Vertex> &vertices, std::vector<unsigned int> &indices, glm::ivec3 blockPos, FaceDirection dir);
 
 Chunk::Chunk(const glm::ivec3 &chunkPos) : m_pos(chunkPos) {
+    const int baseHeight = 60;
+    const int amplitude  = 10;
+    float scale = 0.005f;
+
     for (int x = 0; x < CHUNK_SIZE; x++) {
-        for (int y =  0; y <  CHUNK_SIZE; y++) {
-            for (int z = 0; z < CHUNK_SIZE; z++) {
+        for (int z = 0; z < CHUNK_SIZE; z++) {
+            int worldX = m_pos.x + x;
+            int worldZ = m_pos.z + z;
+
+            float low  = gPerlinNoise->fbm2D(worldX * scale, worldZ * scale);
+
+            low = glm::clamp(low, 0.0f, 1.0f);
+            // low  = (low  + 1.0f) * 0.5f;
+
+            float h = low;
+            h = pow(h, 1.1f);
+
+            int blockHeight = baseHeight + static_cast<int>(h * amplitude);
+
+            for (int y = 0; y < CHUNK_SIZE; y++) {
+                int worldY = m_pos.y + y;
+
                 BlockType block;
-                if (y < 1)
-                    block = BlockType::BEDROCK;
-                else if (y < 5)
+                if (worldY <= blockHeight - 3)
                     block = BlockType::STONE;
-                else if (y < 10)
+                else if (worldY <= blockHeight)
                     block = BlockType::DIRT;
                 else
                     block = BlockType::AIR;
+
                 m_blocks[x][y][z] = block;
             }
         }
     }
+
     updateMesh();
     uploadMesh();
 }

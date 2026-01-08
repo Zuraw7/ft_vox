@@ -12,12 +12,25 @@
 #include "object/Object.hpp"
 #include "perlinNoise/PerlinNoise.hpp"
 
-Camera gCamera(glm::vec3(0.0f, 0.0f, 3.0f),
+Camera gCamera(glm::vec3(0.0f, 80.0f, 3.0f),
         glm::vec3(0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f));
 
 std::unique_ptr<TextureManager> gTextureManager;
 std::unique_ptr<PerlinNoise> gPerlinNoise;
+
+void createChunks(std::vector<Chunk> &chunks)
+{
+    for (int x = 0; x < 20; x++) {
+        for (int z = 0; z < 20; z++) {
+            for (int y = 0; y < (256 / 16); y++) {
+                glm::ivec3 chunkPos(x * CHUNK_SIZE, y * CHUNK_SIZE, z * CHUNK_SIZE);
+
+                chunks.emplace_back(chunkPos);
+            }
+        }
+    }
+}
 
 int main () {
     Resolution currentRes = FHD;
@@ -52,10 +65,11 @@ int main () {
     Shader shader("../res/shaders/vertex.shader", "../res/shaders/fragment.shader");
 
     std::vector<Chunk> chunks;
+    createChunks(chunks);
 
     Renderer renderer;
-    const unsigned int slot = gTextureManager->getSlot(texturePath[0]);
-    gTextureManager->bindTexture(texturePath[0]);
+    const unsigned int slot = gTextureManager->getSlot(texturePath[1]);
+    gTextureManager->bindTexture(texturePath[1]);
     shader.setInt("uTexture", slot);
 
     double lastFrame = glfwGetTime();

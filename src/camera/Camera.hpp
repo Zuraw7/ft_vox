@@ -7,7 +7,7 @@
 #include "../utils/utils.hpp"
 
 #define NEAR 0.1f
-#define FAR 100.0f
+#define FAR 450.0f
 #define SENSITIVITY 0.1f
 
 enum CameraDirection {
