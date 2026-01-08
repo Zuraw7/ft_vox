@@ -22,12 +22,10 @@ add_executable(ft_vox
         src/wrappers/wrapGLFW.cpp
         src/wrappers/wrapGLAD.cpp
         src/object/Mesh.cpp
-        src/object/Mesh.hpp
         include/stb/stb_image.c
         src/object/Object.cpp
-        src/object/Object.hpp
         src/chunk/Chunk.cpp
-        src/chunk/Chunk.hpp
+        src/perlinNoise/PerlinNoise.cpp
 )
 
 target_include_directories(ft_vox

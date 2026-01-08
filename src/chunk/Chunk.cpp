@@ -1,7 +1,10 @@
 #include "Chunk.hpp"
 #include "../object/Mesh.hpp"
 #include "../shader/Shader.hpp"
-#include "glm/ext/matrix_transform.hpp"
+#include "../perlinNoise/PerlinNoise.hpp"
+#include <glm/ext/matrix_transform.hpp>
+
+extern std::unique_ptr<PerlinNoise> gPerlinNoise;
 
 enum class FaceDirection {
     TOP,

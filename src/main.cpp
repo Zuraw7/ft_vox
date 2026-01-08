@@ -10,15 +10,18 @@
 #include "textures/TextureManager.hpp"
 #include "utils/declarations.hpp"
 #include "object/Object.hpp"
+#include "perlinNoise/PerlinNoise.hpp"
 
 Camera gCamera(glm::vec3(0.0f, 0.0f, 3.0f),
         glm::vec3(0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f));
 
 std::unique_ptr<TextureManager> gTextureManager;
+std::unique_ptr<PerlinNoise> gPerlinNoise;
 
 int main () {
-    Resolution currentRes = HD;
+    Resolution currentRes = FHD;
+    int worldSeed = 2115;
 
     // Prepare GLFW and GLAD
     GLFWwindow *window = wrapGLFW::init(currentRes.width, currentRes.height, "ft_vox");
@@ -44,23 +47,16 @@ int main () {
         gTextureManager->loadTexture2D(path);
     }
 
+    gPerlinNoise = std::make_unique<PerlinNoise>(worldSeed);
+
     Shader shader("../res/shaders/vertex.shader", "../res/shaders/fragment.shader");
 
-    // std::vector<std::unique_ptr<Object>> objects;
-    // objects.emplace_back(std::make_unique<Object>("../res/objects/Cube.obj"));
-    // objects.at(objects.size() - 1)->setTexture(texturePath[2]);
-    // objects.at(objects.size() - 1)->setScale(glm::vec3(0.5f));
-    // objects.at(objects.size() - 1)->setPosition(glm::vec3(1.0f));
-
-    Chunk chunk({5, -8, 0});
-    Chunk chunk2({5, -8, 16});
-    Chunk chunk3({5, -8, 32});
-
-    chunk.uploadMesh();
-    chunk2.uploadMesh();
-    chunk3.uploadMesh();
+    std::vector<Chunk> chunks;
 
     Renderer renderer;
+    const unsigned int slot = gTextureManager->getSlot(texturePath[0]);
+    gTextureManager->bindTexture(texturePath[0]);
+    shader.setInt("uTexture", slot);
 
     double lastFrame = glfwGetTime();
     // Game LOOP
@@ -77,13 +73,8 @@ int main () {
         shader.setUniformMatrix4fv("uView", gCamera.getCamView());
         shader.setUniformMatrix4fv("uProjection", gCamera.getCamProjection());
 
-        chunk.draw(shader);
-        chunk2.draw(shader);
-        chunk3.draw(shader);
-
-        // for (auto &object: objects) {
-        //     renderer.draw(object, shader, deltaTime);
-        // }
+        for (auto &chunk: chunks)
+            chunk.draw(shader);
 
         glfwSwapBuffers(window);
 
