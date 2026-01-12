@@ -1,5 +1,6 @@
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
+#include <fnl/fnl.hpp>
 
 #include "camera/Camera.hpp"
 #include "chunk/Chunk.hpp"
@@ -12,22 +13,26 @@
 #include "object/Object.hpp"
 #include "perlinNoise/PerlinNoise.hpp"
 
-Camera gCamera(glm::vec3(0.0f, 80.0f, 3.0f),
+Camera gCamera(glm::vec3(0.0f, 70.0f, 0.0f),
         glm::vec3(0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f));
 
 std::unique_ptr<TextureManager> gTextureManager;
-std::unique_ptr<PerlinNoise> gPerlinNoise;
+std::unique_ptr<FastNoiseLite> gFastNoiseLite;
+
+void setupFnl(int worldSeed) {
+    gFastNoiseLite = std::make_unique<FastNoiseLite>();
+    gFastNoiseLite->SetSeed(worldSeed);
+    gFastNoiseLite->SetNoiseType(FastNoiseLite::NoiseType_Perlin);
+    gFastNoiseLite->SetFractalType(FastNoiseLite::FractalType_FBm);
+}
 
 void createChunks(std::vector<Chunk> &chunks)
 {
     for (int x = 0; x < 20; x++) {
         for (int z = 0; z < 20; z++) {
-            for (int y = 0; y < (256 / 16); y++) {
-                glm::ivec3 chunkPos(x * CHUNK_SIZE, y * CHUNK_SIZE, z * CHUNK_SIZE);
-
-                chunks.emplace_back(chunkPos);
-            }
+            glm::ivec2 chunkPos(x, z);
+            chunks.emplace_back(chunkPos);
         }
     }
 }
@@ -48,9 +53,9 @@ int main () {
 
     std::string texturePath[] = {
         "../res/textures/blocks/dirt.png",
+        "../res/textures/blocks/beacon.png",
         "../res/textures/blocks/stone.png",
         "../res/textures/blocks/bedrock.png",
-        "../res/textures/blocks/brick.png",
         "../res/textures/blocks/diamond_ore.png",
         "../res/textures/blocks/bookshelf.png",
     };
@@ -60,10 +65,9 @@ int main () {
         gTextureManager->loadTexture2D(path);
     }
 
-    gPerlinNoise = std::make_unique<PerlinNoise>(worldSeed);
-
     Shader shader("../res/shaders/vertex.shader", "../res/shaders/fragment.shader");
 
+    setupFnl(worldSeed);
     std::vector<Chunk> chunks;
     createChunks(chunks);
 
@@ -87,12 +91,11 @@ int main () {
         shader.setUniformMatrix4fv("uView", gCamera.getCamView());
         shader.setUniformMatrix4fv("uProjection", gCamera.getCamProjection());
 
-        for (auto &chunk: chunks)
-            chunk.draw(shader);
+        renderer.draw(chunks, shader, deltaTime);
 
         glfwSwapBuffers(window);
 
-        fprintf(stdout, "FPS: %f\n", 1.0 / deltaTime);
+        // fprintf(stdout, "FPS: %f\n", 1.0 / deltaTime);
         glfwPollEvents();
     }
 

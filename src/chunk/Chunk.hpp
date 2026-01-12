@@ -3,13 +3,15 @@
 
 #include <memory>
 #include <vector>
-#include <glm/vec3.hpp>
+#include <glm/vec2.hpp>
 
 class Shader;
 class Mesh;
 struct Vertex;
 
 constexpr int CHUNK_SIZE = 16;
+constexpr int WORLD_HEIGHT = 256;
+constexpr int WORLD_SIZE = 16384;
 
 enum class BlockType : uint8_t {
     AIR,
@@ -21,7 +23,7 @@ enum class BlockType : uint8_t {
 class Chunk {
 public:
 
-    Chunk(const glm::ivec3 &chunkPos);
+    Chunk(const glm::ivec2 &chunkPos);
 
     void updateMesh();
     void uploadMesh();
@@ -29,8 +31,8 @@ public:
 
 private:
 
-    BlockType m_blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
-    glm::ivec3 m_pos;
+    BlockType m_blocks[CHUNK_SIZE][WORLD_HEIGHT][CHUNK_SIZE];
+    glm::ivec2 m_pos;
     std::vector<Vertex> m_vertices;
     std::vector<unsigned int> m_indices;
     std::unique_ptr<Mesh> m_mesh;

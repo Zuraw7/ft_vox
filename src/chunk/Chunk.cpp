@@ -1,12 +1,12 @@
 #include "Chunk.hpp"
 #include "../object/Mesh.hpp"
 #include "../shader/Shader.hpp"
-#include "../perlinNoise/PerlinNoise.hpp"
+#include <fnl/fnl.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
 #define WORLD_MAX_HEIGHT 256
 
-extern std::unique_ptr<PerlinNoise> gPerlinNoise;
+extern std::unique_ptr<FastNoiseLite> gFastNoiseLite;
 
 enum class FaceDirection {
     TOP,
@@ -19,38 +19,29 @@ enum class FaceDirection {
 
 void addFace(std::vector<Vertex> &vertices, std::vector<unsigned int> &indices, glm::ivec3 blockPos, FaceDirection dir);
 
-Chunk::Chunk(const glm::ivec3 &chunkPos) : m_pos(chunkPos) {
-    const int baseHeight = 60;
-    const int amplitude  = 10;
-    float scale = 0.005f;
+
+BlockType getBlock(const int x, const int y, const int z) {
+    constexpr float baseHeight = 80;
+    constexpr float amplitude = 20;
+
+    float noise = gFastNoiseLite->GetNoise(static_cast<float>(x), static_cast<float>(z)) * amplitude;
+    float surfaceY = baseHeight + noise;
+
+    return y < surfaceY ? BlockType::STONE : BlockType::AIR;
+}
+
+// m_pos is glm::ivec2 (it contains x and y) so x = x and z = y
+Chunk::Chunk(const glm::ivec2 &chunkPos) : m_pos(chunkPos) {
 
     for (int x = 0; x < CHUNK_SIZE; x++) {
+        const int worldX = m_pos.x * CHUNK_SIZE + x;
+
         for (int z = 0; z < CHUNK_SIZE; z++) {
-            int worldX = m_pos.x + x;
-            int worldZ = m_pos.z + z;
+            const int worldZ = m_pos.y * CHUNK_SIZE + z;
 
-            float low  = gPerlinNoise->fbm2D(worldX * scale, worldZ * scale);
+            for (int y = 0; y < WORLD_HEIGHT; y++) {
 
-            low = glm::clamp(low, 0.0f, 1.0f);
-            // low  = (low  + 1.0f) * 0.5f;
-
-            float h = low;
-            h = pow(h, 1.1f);
-
-            int blockHeight = baseHeight + static_cast<int>(h * amplitude);
-
-            for (int y = 0; y < CHUNK_SIZE; y++) {
-                int worldY = m_pos.y + y;
-
-                BlockType block;
-                if (worldY <= blockHeight - 3)
-                    block = BlockType::STONE;
-                else if (worldY <= blockHeight)
-                    block = BlockType::DIRT;
-                else
-                    block = BlockType::AIR;
-
-                m_blocks[x][y][z] = block;
+                m_blocks[x][y][z] = getBlock(worldX, y, worldZ);
             }
         }
     }
@@ -64,13 +55,13 @@ void Chunk::updateMesh() {
     m_indices.clear();
 
     for (int x = 0; x < CHUNK_SIZE; x++) {
-        for (int y =  0; y <  CHUNK_SIZE; y++) {
-            for (int z = 0; z < CHUNK_SIZE; z++) {
+        for (int z = 0; z < CHUNK_SIZE; z++) {
+            for (int y =  0; y < WORLD_HEIGHT; y++) {
                 if (m_blocks[x][y][z] == BlockType::AIR)
                     continue;
                 // Check for every neighbor if AIR
                 // Top
-                if (y == CHUNK_SIZE - 1 || m_blocks[x][y + 1][z] == BlockType::AIR) {
+                if (y == WORLD_HEIGHT - 1 || m_blocks[x][y + 1][z] == BlockType::AIR) {
                     addFace(m_vertices, m_indices, glm::ivec3(x, y, z), FaceDirection::TOP);
                 }
 
@@ -109,7 +100,7 @@ void Chunk::uploadMesh() {
 
 void Chunk::draw(Shader &shader) const {
     glm::mat4 model(1.0f);
-    model = glm::translate(model, glm::vec3(m_pos));
+    model = glm::translate(model, glm::vec3(m_pos.x * CHUNK_SIZE, 0, m_pos.y * CHUNK_SIZE));
     shader.setUniformMatrix4fv("uModel", model);
     if (m_mesh)
         m_mesh->draw(shader);
