@@ -11,7 +11,6 @@
 #include "textures/TextureManager.hpp"
 #include "utils/declarations.hpp"
 #include "object/Object.hpp"
-#include "perlinNoise/PerlinNoise.hpp"
 
 Camera gCamera(glm::vec3(0.0f, 70.0f, 0.0f),
         glm::vec3(0.0f),
