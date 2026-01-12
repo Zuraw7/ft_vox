@@ -30,7 +30,7 @@ void createChunks(std::vector<Chunk> &chunks)
 {
     for (int x = 0; x < 20; x++) {
         for (int z = 0; z < 20; z++) {
-            glm::ivec2 chunkPos(x, z);
+            glm::ivec2 chunkPos(x * CHUNK_SIZE, z * CHUNK_SIZE);
             chunks.emplace_back(chunkPos);
         }
     }

@@ -34,10 +34,10 @@ BlockType getBlock(const int x, const int y, const int z) {
 Chunk::Chunk(const glm::ivec2 &chunkPos) : m_pos(chunkPos) {
 
     for (int x = 0; x < CHUNK_SIZE; x++) {
-        const int worldX = m_pos.x * CHUNK_SIZE + x;
+        const int worldX = m_pos.x + x;
 
         for (int z = 0; z < CHUNK_SIZE; z++) {
-            const int worldZ = m_pos.y * CHUNK_SIZE + z;
+            const int worldZ = m_pos.y + z;
 
             for (int y = 0; y < WORLD_HEIGHT; y++) {
 
@@ -100,7 +100,7 @@ void Chunk::uploadMesh() {
 
 void Chunk::draw(Shader &shader) const {
     glm::mat4 model(1.0f);
-    model = glm::translate(model, glm::vec3(m_pos.x * CHUNK_SIZE, 0, m_pos.y * CHUNK_SIZE));
+    model = glm::translate(model, glm::vec3(m_pos.x, 0, m_pos.y));
     shader.setUniformMatrix4fv("uModel", model);
     if (m_mesh)
         m_mesh->draw(shader);
