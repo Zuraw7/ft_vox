@@ -9,7 +9,7 @@ extern std::unique_ptr<FastNoiseLite> gContinentalNoise;
 extern std::unique_ptr<FastNoiseLite> gErosionNoise;
 extern std::unique_ptr<FastNoiseLite> gPeaksNoise;
 
-float getPoint(float noise, const std::vector<std::pair<float, float>> &heights) {
+static float getPoint(float noise, const std::vector<std::pair<float, float>> &heights) {
     for (int i = 0; i < heights.size() - 1; i++) {
          if (heights[i].first <= noise && heights[i + 1].first >= noise) {
              float t = (noise - heights[i].first) / (heights[i + 1].first - heights[i].first);

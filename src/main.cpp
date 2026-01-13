@@ -1,3 +1,4 @@
+#include <random>
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 #include <fnl/fnl.hpp>
@@ -12,7 +13,7 @@
 #include "utils/declarations.hpp"
 #include "object/Object.hpp"
 
-Camera gCamera(glm::vec3(123412.0f, 70.0f, -123412.0f),
+Camera gCamera(glm::vec3(0.0f, 140.0f, 0.0f),
         glm::vec3(0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f));
 
@@ -49,6 +50,17 @@ void createChunks(float x, float z, std::vector<Chunk> &chunks)
     }
 }
 
+// TODO: After creating player character -> move to class
+glm::vec2 getSpawn(const int worldSeed) {
+    std::mt19937 rng(worldSeed);
+    std::uniform_int_distribution<int> distX(-(WORLD_SIZE / 2), WORLD_SIZE / 2);
+    std::uniform_int_distribution<int> distZ(-(WORLD_SIZE / 2), WORLD_SIZE / 2);
+    int x = distX(rng);
+    int z = distZ(rng);
+
+    return glm::vec2(x, z);
+}
+
 int main () {
     Resolution currentRes = FHD;
     int worldSeed = 2115;
@@ -81,6 +93,9 @@ int main () {
 
     setupFnl(worldSeed);
     std::vector<Chunk> chunks;
+
+    glm::vec2 spawnPoint = getSpawn(worldSeed);
+    gCamera.setCameraPosition({spawnPoint.x, gCamera.getPosition().y ,spawnPoint.y});
     createChunks(gCamera.getPosition().x, gCamera.getPosition().z, chunks);
 
     Renderer renderer;

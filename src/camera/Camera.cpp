@@ -92,6 +92,10 @@ void Camera::switchPolygonMode() {
     m_polygonMode = !m_polygonMode;
 }
 
+void Camera::setCameraPosition(glm::vec3 newPos) {
+    m_camPosition = newPos;
+}
+
 glm::mat4 Camera::lookAt() const {
     return glm::lookAt(m_camPosition, m_camPosition + m_camDirection, m_worldUp);
 }

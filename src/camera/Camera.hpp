@@ -43,6 +43,8 @@ public:
     void updateCameraVectors();
     void switchPolygonMode();
 
+    void setCameraPosition(glm::vec3 newPos);
+
 private:
     // Vectors
     glm::vec3 m_camPosition;
