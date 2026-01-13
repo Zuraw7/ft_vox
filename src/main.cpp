@@ -53,10 +53,9 @@ void createChunks(float x, float z, std::vector<Chunk> &chunks)
 // TODO: After creating player character -> move to class
 glm::vec2 getSpawn(const int worldSeed) {
     std::mt19937 rng(worldSeed);
-    std::uniform_int_distribution<int> distX(-(WORLD_SIZE / 2), WORLD_SIZE / 2);
-    std::uniform_int_distribution<int> distZ(-(WORLD_SIZE / 2), WORLD_SIZE / 2);
-    int x = distX(rng);
-    int z = distZ(rng);
+    std::uniform_int_distribution<int> locate(-(WORLD_SIZE / 2), WORLD_SIZE / 2);
+    int x = locate(rng);
+    int z = locate(rng);
 
     return glm::vec2(x, z);
 }
