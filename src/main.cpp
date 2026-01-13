@@ -12,24 +12,37 @@
 #include "utils/declarations.hpp"
 #include "object/Object.hpp"
 
-Camera gCamera(glm::vec3(0.0f, 70.0f, 0.0f),
+Camera gCamera(glm::vec3(123412.0f, 70.0f, -123412.0f),
         glm::vec3(0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f));
 
 std::unique_ptr<TextureManager> gTextureManager;
-std::unique_ptr<FastNoiseLite> gFastNoiseLite;
+std::unique_ptr<FastNoiseLite> gContinentalNoise;
+std::unique_ptr<FastNoiseLite> gErosionNoise;
+std::unique_ptr<FastNoiseLite> gPeaksNoise;
 
 void setupFnl(int worldSeed) {
-    gFastNoiseLite = std::make_unique<FastNoiseLite>();
-    gFastNoiseLite->SetSeed(worldSeed);
-    gFastNoiseLite->SetNoiseType(FastNoiseLite::NoiseType_Perlin);
-    gFastNoiseLite->SetFractalType(FastNoiseLite::FractalType_FBm);
+    gContinentalNoise = std::make_unique<FastNoiseLite>();
+    gContinentalNoise->SetSeed(worldSeed);
+    gContinentalNoise->SetNoiseType(FastNoiseLite::NoiseType_Perlin);
+    gContinentalNoise->SetFractalType(FastNoiseLite::FractalType_FBm);
+    gErosionNoise = std::make_unique<FastNoiseLite>();
+    gErosionNoise->SetSeed(worldSeed + 200);
+    gErosionNoise->SetNoiseType(FastNoiseLite::NoiseType_Perlin);
+    gErosionNoise->SetFractalType(FastNoiseLite::FractalType_FBm);
+    gPeaksNoise = std::make_unique<FastNoiseLite>();
+    gPeaksNoise->SetSeed(worldSeed + 300);
+    gPeaksNoise->SetNoiseType(FastNoiseLite::NoiseType_Perlin);
+    gPeaksNoise->SetFractalType(FastNoiseLite::FractalType_FBm);
 }
 
-void createChunks(std::vector<Chunk> &chunks)
+void createChunks(float x, float z, std::vector<Chunk> &chunks)
 {
-    for (int x = 0; x < 20; x++) {
-        for (int z = 0; z < 20; z++) {
+    int xPos = x / 16;
+    int zPos = z / 16;
+
+    for (int x = xPos - 8; x < xPos + 8; x++) {
+        for (int z = zPos - 8; z < zPos + 8; z++) {
             glm::ivec2 chunkPos(x * CHUNK_SIZE, z * CHUNK_SIZE);
             chunks.emplace_back(chunkPos);
         }
@@ -68,7 +81,7 @@ int main () {
 
     setupFnl(worldSeed);
     std::vector<Chunk> chunks;
-    createChunks(chunks);
+    createChunks(gCamera.getPosition().x, gCamera.getPosition().z, chunks);
 
     Renderer renderer;
     const unsigned int slot = gTextureManager->getSlot(texturePath[1]);

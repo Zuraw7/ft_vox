@@ -2,30 +2,37 @@
 #include "../object/Mesh.hpp"
 #include "../shader/Shader.hpp"
 #include <fnl/fnl.hpp>
-#include <glm/ext/matrix_transform.hpp>
 
 #define WORLD_MAX_HEIGHT 256
 
-extern std::unique_ptr<FastNoiseLite> gFastNoiseLite;
+extern std::unique_ptr<FastNoiseLite> gContinentalNoise;
+extern std::unique_ptr<FastNoiseLite> gErosionNoise;
+extern std::unique_ptr<FastNoiseLite> gPeaksNoise;
 
-enum class FaceDirection {
-    TOP,
-    BOTTOM,
-    LEFT,
-    RIGHT,
-    FRONT,
-    BACK
-};
+float getPoint(float noise, const std::vector<std::pair<float, float>> &heights) {
+    for (int i = 0; i < heights.size() - 1; i++) {
+         if (heights[i].first <= noise && heights[i + 1].first >= noise) {
+             float t = (noise - heights[i].first) / (heights[i + 1].first - heights[i].first);
+             t = glm::smoothstep(0.0f, 1.0f, t);
+             return glm::mix(heights[i].second, heights[i + 1].second, t);
+         }
+    }
 
-void addFace(std::vector<Vertex> &vertices, std::vector<unsigned int> &indices, glm::ivec3 blockPos, FaceDirection dir);
-
+    return heights.back().second;
+}
 
 BlockType getBlock(const int x, const int y, const int z) {
-    constexpr float baseHeight = 80;
-    constexpr float amplitude = 20;
+    float continentalness = gContinentalNoise->GetNoise(x * 0.4f, z * 0.4f);
+    float erosion = gErosionNoise->GetNoise(x * 0.6f, z * 0.6f);
+    float peaksAndValleys = gPeaksNoise->GetNoise(x * 0.8f, z * 0.8f);
 
-    float noise = gFastNoiseLite->GetNoise(static_cast<float>(x), static_cast<float>(z)) * amplitude;
-    float surfaceY = baseHeight + noise;
+    float continentalHeight = getPoint(continentalness, continentalPoints);
+    float erosionHeight = getPoint(erosion, erosionPoints);
+    float peaksAndValleysHeight = getPoint(peaksAndValleys, peaksAndValleysPoints);
+
+    float mountainMask = glm::smoothstep(0.2f, 0.7f, continentalness);
+
+    float surfaceY =  continentalHeight + erosionHeight * 0.4f + peaksAndValleysHeight * mountainMask;
 
     return y < surfaceY ? BlockType::STONE : BlockType::AIR;
 }
@@ -106,7 +113,7 @@ void Chunk::draw(Shader &shader) const {
         m_mesh->draw(shader);
 }
 
-void addFace(std::vector<Vertex> &vertices, std::vector<unsigned int> &indices, glm::ivec3 blockPos, FaceDirection dir) {
+void Chunk::addFace(std::vector<Vertex> &vertices, std::vector<unsigned int> &indices, glm::ivec3 blockPos, FaceDirection dir) {
     uint32_t offset = vertices.size();
     glm::vec3 normal;
     glm::vec3 vert[4];
