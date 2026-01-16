@@ -6,7 +6,6 @@ set(CMAKE_CXX_STANDARD 14)
 
 add_executable(ft_vox
         src/main.cpp
-        src/gl.c
         src/camera/Camera.cpp
         src/shader/Shader.cpp
         src/buffers/VertexArray.cpp
@@ -22,10 +21,11 @@ add_executable(ft_vox
         src/wrappers/wrapGLFW.cpp
         src/wrappers/wrapGLAD.cpp
         src/object/Mesh.cpp
-        include/stb/stb_image.c
         src/object/Object.cpp
         src/chunk/Chunk.cpp
         src/chunk/ChunkManager.cpp
+        include/glad/gl.c
+        include/stb/stb_image.c
 )
 
 target_include_directories(ft_vox
