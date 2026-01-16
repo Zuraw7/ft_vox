@@ -18,7 +18,7 @@ void Renderer::clear() const {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void Renderer::draw(ChunkManager &chunkManager, Shader &shader, float deltaTime) const {
+void Renderer::draw(ChunkManager &chunkManager, Shader &shader, double deltaTime) const {
 
     shader.bind();
 

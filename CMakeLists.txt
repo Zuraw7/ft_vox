@@ -6,24 +6,23 @@ set(CMAKE_CXX_STANDARD 14)
 
 add_executable(ft_vox
         src/main.cpp
-        src/camera/Camera.cpp
-        src/shader/Shader.cpp
         src/buffers/VertexArray.cpp
         src/buffers/VertexBuffer.cpp
         src/buffers/IndexBuffer.cpp
+        src/camera/Camera.cpp
+        src/chunk/Chunk.cpp
+        src/chunk/ChunkManager.cpp
+        src/graphicsContext/GraphicsContext.cpp
+        src/object/Mesh.cpp
+        src/object/Object.cpp
         src/renderer/Renderer.cpp
+        src/shader/Shader.cpp
         src/textures/Texture2D.cpp
         src/textures/TextureManager.cpp
         src/utils/callbacks.cpp
         src/utils/declarations.cpp
         src/utils/utils.cpp
         src/utils/inputManagement.cpp
-        src/wrappers/wrapGLFW.cpp
-        src/wrappers/wrapGLAD.cpp
-        src/object/Mesh.cpp
-        src/object/Object.cpp
-        src/chunk/Chunk.cpp
-        src/chunk/ChunkManager.cpp
         include/glad/gl.c
         include/stb/stb_image.c
 )

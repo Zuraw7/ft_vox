@@ -1,18 +1,13 @@
 #include <random>
-#include <glad/gl.h>
-#include <GLFW/glfw3.h>
-#include <fnl/fnl.hpp>
-
 #include "camera/Camera.hpp"
 #include "chunk/Chunk.hpp"
 #include "chunk/ChunkManager.hpp"
-#include "wrappers/wrapGLFW.hpp"
-#include "wrappers/wrapGLAD.hpp"
 #include "shader/Shader.hpp"
 #include "renderer/Renderer.hpp"
 #include "textures/TextureManager.hpp"
 #include "utils/declarations.hpp"
 #include "object/Object.hpp"
+#include "graphicsContext/GraphicsContext.hpp"
 
 Camera gCamera(glm::vec3(0.0f, 140.0f, 0.0f),
         glm::vec3(0.0f),
@@ -34,15 +29,7 @@ int main () {
     Resolution currentRes = FHD;
     int worldSeed = 2115;
 
-    // Prepare GLFW and GLAD
-    GLFWwindow *window = wrapGLFW::init(currentRes.width, currentRes.height, "ft_vox");
-    if (!window)
-        return 1;
-
-    if (!wrapGLAD::init()) {
-        wrapGLFW::exit(window);
-        return 1;
-    }
+    GraphicsContext::setup(currentRes.width, currentRes.height, "ft_vox");
 
     std::string texturePath[] = {
         "../res/textures/blocks/dirt.png",
@@ -74,14 +61,11 @@ int main () {
     gTextureManager->bindTexture(texturePath[1]);
     shader.setInt("uTexture", slot);
 
-    double lastFrame = glfwGetTime();
     // Game LOOP
-    while (!glfwWindowShouldClose(window)) {
-        double thisFrame = glfwGetTime();
-        double deltaTime = thisFrame - lastFrame;
-        lastFrame = thisFrame;
+    while (!GraphicsContext::shouldClose()) {
+        double deltaTime = GraphicsContext::deltaTime();
 
-        processInput(window, renderer, deltaTime);
+        processInput(GraphicsContext::window(), renderer, deltaTime);
 
         renderer.setBackgroundColor(0.2f, 0.3f, 0.3f, 1.0f);
         renderer.clear();
@@ -91,14 +75,11 @@ int main () {
 
         renderer.draw(chunkManager, shader, deltaTime);
 
-        glfwSwapBuffers(window);
-
-        // fprintf(stdout, "FPS: %f\n", 1.0 / deltaTime);
-        glfwPollEvents();
+        GraphicsContext::update();
+        fprintf(stdout, "FPS: %d\n", GraphicsContext::FPS());
     }
 
-    // Cleanup
-    wrapGLFW::exit(window);
+    GraphicsContext::cleanup();
 
     return 0;
 }
