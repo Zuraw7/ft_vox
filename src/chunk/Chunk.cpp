@@ -152,6 +152,7 @@ void Chunk::addFace(std::vector<Vertex> &vertices, std::vector<unsigned int> &in
     uint32_t offset = vertices.size();
     glm::vec3 normal;
     glm::vec3 vert[4];
+    float faceLight = 0.8f;
 
     switch (dir) {
         case FaceDirection::TOP:
@@ -160,6 +161,7 @@ void Chunk::addFace(std::vector<Vertex> &vertices, std::vector<unsigned int> &in
             vert[1] = {1, 1, 0};
             vert[2] = {1, 1, 1};
             vert[3] = {0, 1, 1};
+            faceLight = 1.0f;
             break;
         case FaceDirection::BOTTOM:
             normal = {0, -1, 0};
@@ -167,6 +169,7 @@ void Chunk::addFace(std::vector<Vertex> &vertices, std::vector<unsigned int> &in
             vert[1] = {0, 0, 1};
             vert[2] = {1, 0, 1};
             vert[3] = {1, 0, 0};
+            faceLight = 0.6f;
             break;
         case FaceDirection::LEFT:
             normal = {-1, 0, 0};
@@ -200,7 +203,7 @@ void Chunk::addFace(std::vector<Vertex> &vertices, std::vector<unsigned int> &in
 
     glm::vec2 uv[4] = {{0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f}};
     for (int i = 0; i < 4; i++)
-        vertices.push_back({glm::vec3(vert[i]) + glm::vec3(blockPos), normal, uv[i]});
+        vertices.push_back({glm::vec3(vert[i]) + glm::vec3(blockPos), normal, uv[i], faceLight});
 
     indices.push_back(offset + 0);
     indices.push_back(offset + 3);
