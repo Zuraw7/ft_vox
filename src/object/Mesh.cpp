@@ -13,6 +13,25 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices) {
     setupMesh();
 }
 
+Mesh::Mesh(Mesh &&other) noexcept
+    : m_vertices(std::move(other.m_vertices)),
+      m_indices(std::move(other.m_indices)),
+      m_VAO(std::move(other.m_VAO)),
+      m_VBO(std::move(other.m_VBO)),
+      m_EBO(std::move(other.m_EBO)) {
+}
+
+Mesh &Mesh::operator=(Mesh &&other) noexcept {
+    if (this == &other)
+        return *this;
+    m_vertices = std::move(other.m_vertices);
+    m_indices = std::move(other.m_indices);
+    m_VAO = std::move(other.m_VAO);
+    m_VBO = std::move(other.m_VBO);
+    m_EBO = std::move(other.m_EBO);
+    return *this;
+}
+
 void Mesh::draw(Shader &shader) const {
     m_VAO->bind();
     glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, nullptr);

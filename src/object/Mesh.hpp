@@ -21,6 +21,10 @@ struct Vertex {
 class Mesh {
 public:
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices);
+    ~Mesh() = default;
+
+    Mesh(Mesh &&other) noexcept;
+    Mesh &operator=(Mesh &&other) noexcept;
 
     std::vector<Vertex> m_vertices;
     std::vector<unsigned int> m_indices;

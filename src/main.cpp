@@ -5,6 +5,7 @@
 
 #include "camera/Camera.hpp"
 #include "chunk/Chunk.hpp"
+#include "chunk/ChunkManager.hpp"
 #include "wrappers/wrapGLFW.hpp"
 #include "wrappers/wrapGLAD.hpp"
 #include "shader/Shader.hpp"
@@ -18,37 +19,6 @@ Camera gCamera(glm::vec3(0.0f, 140.0f, 0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f));
 
 std::unique_ptr<TextureManager> gTextureManager;
-std::unique_ptr<FastNoiseLite> gContinentalNoise;
-std::unique_ptr<FastNoiseLite> gErosionNoise;
-std::unique_ptr<FastNoiseLite> gPeaksNoise;
-
-void setupFnl(int worldSeed) {
-    gContinentalNoise = std::make_unique<FastNoiseLite>();
-    gContinentalNoise->SetSeed(worldSeed);
-    gContinentalNoise->SetNoiseType(FastNoiseLite::NoiseType_Perlin);
-    gContinentalNoise->SetFractalType(FastNoiseLite::FractalType_FBm);
-    gErosionNoise = std::make_unique<FastNoiseLite>();
-    gErosionNoise->SetSeed(worldSeed + 200);
-    gErosionNoise->SetNoiseType(FastNoiseLite::NoiseType_Perlin);
-    gErosionNoise->SetFractalType(FastNoiseLite::FractalType_FBm);
-    gPeaksNoise = std::make_unique<FastNoiseLite>();
-    gPeaksNoise->SetSeed(worldSeed + 300);
-    gPeaksNoise->SetNoiseType(FastNoiseLite::NoiseType_Perlin);
-    gPeaksNoise->SetFractalType(FastNoiseLite::FractalType_FBm);
-}
-
-void createChunks(float x, float z, std::vector<Chunk> &chunks)
-{
-    int xPos = x / 16;
-    int zPos = z / 16;
-
-    for (int x = xPos - 8; x < xPos + 8; x++) {
-        for (int z = zPos - 8; z < zPos + 8; z++) {
-            glm::ivec2 chunkPos(x * CHUNK_SIZE, z * CHUNK_SIZE);
-            chunks.emplace_back(chunkPos);
-        }
-    }
-}
 
 // TODO: After creating player character -> move to class
 glm::vec2 getSpawn(const int worldSeed) {
@@ -90,12 +60,14 @@ int main () {
 
     Shader shader("../res/shaders/vertex.shader", "../res/shaders/fragment.shader");
 
-    setupFnl(worldSeed);
-    std::vector<Chunk> chunks;
-
     glm::vec2 spawnPoint = getSpawn(worldSeed);
     gCamera.setCameraPosition({spawnPoint.x, gCamera.getPosition().y ,spawnPoint.y});
-    createChunks(gCamera.getPosition().x, gCamera.getPosition().z, chunks);
+
+    auto now = std::chrono::system_clock::now();
+    ChunkManager chunkManager(spawnPoint.x, spawnPoint.y, worldSeed);
+    auto after = std::chrono::system_clock::now();
+    auto dif = std::chrono::duration_cast<std::chrono::milliseconds>(after - now);
+    fprintf(stdout, "%d ms\n", dif);
 
     Renderer renderer;
     const unsigned int slot = gTextureManager->getSlot(texturePath[1]);
@@ -117,7 +89,7 @@ int main () {
         shader.setUniformMatrix4fv("uView", gCamera.getCamView());
         shader.setUniformMatrix4fv("uProjection", gCamera.getCamProjection());
 
-        renderer.draw(chunks, shader, deltaTime);
+        renderer.draw(chunkManager, shader, deltaTime);
 
         glfwSwapBuffers(window);
 

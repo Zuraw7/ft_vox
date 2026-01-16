@@ -25,6 +25,7 @@ add_executable(ft_vox
         include/stb/stb_image.c
         src/object/Object.cpp
         src/chunk/Chunk.cpp
+        src/chunk/ChunkManager.cpp
 )
 
 target_include_directories(ft_vox

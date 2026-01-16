@@ -6,3 +6,4 @@ cmake_install.cmake
 cmake-build-debug
 ft_vox
 .idea
+build

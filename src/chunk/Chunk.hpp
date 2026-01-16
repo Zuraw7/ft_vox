@@ -5,14 +5,13 @@
 #include <vector>
 #include <glm/vec2.hpp>
 #include <glm/ext/matrix_transform.hpp>
+#include "../utils/declarations.hpp"
 
 class Shader;
 class Mesh;
 struct Vertex;
 
 constexpr int CHUNK_SIZE = 16;
-constexpr int WORLD_HEIGHT = 256;
-constexpr int WORLD_SIZE = 16384;
 
 const std::vector<std::pair<float, float>> continentalPoints {
             {-1.0f, 50},
@@ -49,19 +48,24 @@ enum class FaceDirection {
 
 enum class BlockType : uint8_t {
     AIR,
-    DIRT,
     STONE,
-    BEDROCK
 };
 
 class Chunk {
 public:
 
     Chunk(const glm::ivec2 &chunkPos);
+    Chunk(Chunk &&other) noexcept;
+    Chunk & operator=(Chunk &&other) noexcept;
+    ~Chunk() = default;
 
-    void updateMesh();
+    void updateMesh(Chunk* left, Chunk* right, Chunk* front, Chunk* back);
     void uploadMesh();
+
     void draw(Shader &shader) const;
+
+    glm::ivec2 getPos() const;
+    BlockType getBlockType(int x, int y, int z);
 
 private:
 
