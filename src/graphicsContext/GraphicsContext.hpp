@@ -11,7 +11,8 @@ public:
     static GLFWwindow *window();
 
     static double deltaTime();
-    static int FPS();
+    [[deprecated("Use avgFPS() for more stable, smoothed value.")]] static int FPS();
+    static double avgFPS();
 
     GraphicsContext() = delete;
 private:
@@ -22,6 +23,7 @@ private:
     static int m_frameCount;
     static double m_fpsLastTime;
     static int m_currentFPS;
+    static double m_avgFPS;
 
     static bool setupGLFW(int width, int height, const char *title);
     static void cleanupGLFW();
@@ -30,6 +32,7 @@ private:
 
     static void calculateDelta();
     static void calculateFPS();
+    static void calculateAvgFPS();
 };
 
 

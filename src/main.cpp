@@ -76,7 +76,7 @@ int main () {
         renderer.draw(chunkManager, shader, deltaTime);
 
         GraphicsContext::update();
-        fprintf(stdout, "FPS: %d\n", GraphicsContext::FPS());
+        fprintf(stdout, "avgFPS: %f\n", GraphicsContext::avgFPS());
     }
 
     GraphicsContext::cleanup();

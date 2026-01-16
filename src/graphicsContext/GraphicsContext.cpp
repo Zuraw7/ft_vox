@@ -10,6 +10,7 @@ double GraphicsContext::m_deltaTime = 0.0;
 double GraphicsContext::m_fpsLastTime = 0.0;
 int GraphicsContext::m_frameCount = 0;
 int GraphicsContext::m_currentFPS = 0;
+double GraphicsContext::m_avgFPS = 0.0;
 
 bool GraphicsContext::setup(const int width, const int height, const char *title) {
     if (!setupGLFW(width, height, title))
@@ -32,6 +33,7 @@ bool GraphicsContext::shouldClose() {
 void GraphicsContext::update() {
     calculateDelta();
     calculateFPS();
+    calculateAvgFPS();
     glfwSwapBuffers(m_window);
     glfwPollEvents();
 }
@@ -46,6 +48,15 @@ double GraphicsContext::deltaTime() {
 
 int GraphicsContext::FPS() {
     return m_currentFPS;
+}
+
+double GraphicsContext::avgFPS() {
+    return m_avgFPS;
+}
+
+void GraphicsContext::calculateAvgFPS() {
+    double currentFPS = 1.0 / m_deltaTime;
+    m_avgFPS = 0.9 * m_avgFPS + 0.1 * currentFPS;
 }
 
 bool GraphicsContext::setupGLFW(const int width, const int height, const char *title) {
