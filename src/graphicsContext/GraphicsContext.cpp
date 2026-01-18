@@ -1,7 +1,9 @@
 #include <cstdio>
 #include <glad/gl.h>
 #include "GraphicsContext.hpp"
-#include "../utils/callbacks.hpp"
+
+#include "../inputManager/InputManager.hpp"
+#include "../utils/utils.hpp"
 
 GLFWwindow* GraphicsContext::m_window = nullptr;
 double GraphicsContext::m_lastFrameTime = 0.0;
@@ -34,8 +36,12 @@ void GraphicsContext::update() {
     calculateDelta();
     calculateFPS();
     calculateAvgFPS();
-    glfwSwapBuffers(m_window);
+
     glfwPollEvents();
+
+    InputManager::processInput(m_window, m_deltaTime);
+
+    glfwSwapBuffers(m_window);
 }
 
 GLFWwindow *GraphicsContext::window() {
@@ -79,9 +85,9 @@ bool GraphicsContext::setupGLFW(const int width, const int height, const char *t
 
     glfwMakeContextCurrent(m_window);
 
-    setCallbacks();
+    glfwSetFramebufferSizeCallback(m_window, framebufferSizeCallback);
+
     glfwSetWindowAspectRatio(m_window, 16, 9);
-    glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     glfwSwapInterval(0);
     return true;
@@ -90,12 +96,6 @@ bool GraphicsContext::setupGLFW(const int width, const int height, const char *t
 void GraphicsContext::cleanupGLFW() {
     glfwDestroyWindow(m_window);
     glfwTerminate();
-}
-
-void GraphicsContext::setCallbacks() {
-    glfwSetFramebufferSizeCallback(m_window, framebufferSizeCallback);
-    glfwSetCursorPosCallback(m_window, cursorPosCallback);
-    glfwSetScrollCallback(m_window, scrollCallback);
 }
 
 bool GraphicsContext::setupGLAD() {
@@ -116,6 +116,10 @@ bool GraphicsContext::setupGLAD() {
     glFrontFace(GL_CCW);
 
     return true;
+}
+
+void GraphicsContext::framebufferSizeCallback(GLFWwindow* window, const int width, const int height) {
+    glViewport(0, 0, width, height);
 }
 
 void GraphicsContext::calculateDelta() {

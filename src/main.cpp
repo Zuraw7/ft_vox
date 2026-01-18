@@ -8,6 +8,7 @@
 #include "utils/declarations.hpp"
 #include "object/Object.hpp"
 #include "graphicsContext/GraphicsContext.hpp"
+#include "inputManager/InputManager.hpp"
 
 Camera gCamera(glm::vec3(0.0f, 140.0f, 0.0f),
         glm::vec3(0.0f),
@@ -16,13 +17,13 @@ Camera gCamera(glm::vec3(0.0f, 140.0f, 0.0f),
 std::unique_ptr<TextureManager> gTextureManager;
 
 // TODO: After creating player character -> move to class
-glm::vec2 getSpawn(const int worldSeed) {
+glm::ivec2 getSpawn(const int worldSeed) {
     std::mt19937 rng(worldSeed);
     std::uniform_int_distribution<int> locate(-(WORLD_SIZE / 2), WORLD_SIZE / 2);
     int x = locate(rng);
     int z = locate(rng);
 
-    return glm::vec2(x, z);
+    return {x, z};
 }
 
 int main () {
@@ -30,6 +31,7 @@ int main () {
     int worldSeed = 2115;
 
     GraphicsContext::setup(currentRes.width, currentRes.height, "ft_vox");
+    InputManager::init(GraphicsContext::window());
 
     std::string texturePath[] = {
         "../res/textures/blocks/dirt.png",
@@ -47,14 +49,10 @@ int main () {
 
     Shader shader("../res/shaders/vertex.shader", "../res/shaders/fragment.shader");
 
-    glm::vec2 spawnPoint = getSpawn(worldSeed);
+    glm::ivec2 spawnPoint = getSpawn(worldSeed);
     gCamera.setCameraPosition({spawnPoint.x, gCamera.getPosition().y ,spawnPoint.y});
 
-    auto now = std::chrono::system_clock::now();
     ChunkManager chunkManager(spawnPoint.x, spawnPoint.y, worldSeed);
-    auto after = std::chrono::system_clock::now();
-    auto dif = std::chrono::duration_cast<std::chrono::milliseconds>(after - now);
-    fprintf(stdout, "%d ms\n", dif);
 
     Renderer renderer;
     const unsigned int slot = gTextureManager->getSlot(texturePath[1]);
@@ -64,8 +62,6 @@ int main () {
     // Game LOOP
     while (!GraphicsContext::shouldClose()) {
         double deltaTime = GraphicsContext::deltaTime();
-
-        processInput(GraphicsContext::window(), renderer, deltaTime);
 
         renderer.setBackgroundColor(0.2f, 0.3f, 0.3f, 1.0f);
         renderer.clear();

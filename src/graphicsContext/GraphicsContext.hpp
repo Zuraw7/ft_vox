@@ -27,8 +27,9 @@ private:
 
     static bool setupGLFW(int width, int height, const char *title);
     static void cleanupGLFW();
-    static void setCallbacks();
     static bool setupGLAD();
+
+    static void framebufferSizeCallback(GLFWwindow* window, const int width, const int height);
 
     static void calculateDelta();
     static void calculateFPS();

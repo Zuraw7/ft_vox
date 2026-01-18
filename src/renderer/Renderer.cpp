@@ -1,5 +1,5 @@
 #include <memory>
-
+#include <glad/gl.h>
 #include "Renderer.hpp"
 #include "../camera/Camera.hpp"
 #include "../chunk/ChunkManager.hpp"

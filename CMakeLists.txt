@@ -13,16 +13,16 @@ add_executable(ft_vox
         src/chunk/Chunk.cpp
         src/chunk/ChunkManager.cpp
         src/graphicsContext/GraphicsContext.cpp
+        src/inputManager/InputManager.cpp
         src/object/Mesh.cpp
         src/object/Object.cpp
         src/renderer/Renderer.cpp
         src/shader/Shader.cpp
         src/textures/Texture2D.cpp
         src/textures/TextureManager.cpp
-        src/utils/callbacks.cpp
         src/utils/declarations.cpp
+        src/utils/inputFunctions.cpp
         src/utils/utils.cpp
-        src/utils/inputManagement.cpp
         include/glad/gl.c
         include/stb/stb_image.c
 )
