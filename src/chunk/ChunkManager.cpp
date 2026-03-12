@@ -104,8 +104,10 @@ void ChunkManager::getChunksToRender() {
     for (auto &chunk : m_chunksInCache) {
         int chunkX = chunk.first.x;
         int chunkZ = chunk.first.y;
-        if ((playerX + RENDER_DISTANCE >= chunkX && playerX - RENDER_DISTANCE <= chunkX) && (playerZ + RENDER_DISTANCE >= chunkZ && playerZ - RENDER_DISTANCE <= chunkZ))
+        if ((playerX + RENDER_DISTANCE >= chunkX && playerX - RENDER_DISTANCE <= chunkX) && (playerZ + RENDER_DISTANCE >= chunkZ && playerZ - RENDER_DISTANCE <= chunkZ)) {
             m_chunksToRender.emplace_back(chunk.second.get());
+            m_chunksToRender.at(m_chunksToRender.size() - 1)->isVisible = true;
+        }
     }
 }
 

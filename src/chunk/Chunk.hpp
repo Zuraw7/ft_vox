@@ -59,6 +59,8 @@ public:
     Chunk & operator=(Chunk &&other) noexcept;
     ~Chunk() = default;
 
+    bool isVisible;
+
     void updateMesh(Chunk* left, Chunk* right, Chunk* front, Chunk* back);
     void uploadMesh();
 
@@ -69,8 +71,8 @@ public:
 
 private:
 
-    BlockType m_blocks[CHUNK_SIZE][WORLD_HEIGHT][CHUNK_SIZE];
     glm::ivec2 m_pos;
+    BlockType m_blocks[CHUNK_SIZE][WORLD_HEIGHT][CHUNK_SIZE];
     std::vector<Vertex> m_vertices;
     std::vector<unsigned int> m_indices;
     std::unique_ptr<Mesh> m_mesh;
