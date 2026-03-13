@@ -55,8 +55,8 @@ int main () {
     ChunkManager chunkManager(spawnPoint.x, spawnPoint.y, worldSeed);
 
     Renderer renderer;
-    const unsigned int slot = gTextureManager->getSlot(texturePath[1]);
-    gTextureManager->bindTexture(texturePath[1]);
+    const unsigned int slot = gTextureManager->getSlot(texturePath[0]);
+    gTextureManager->bindTexture(texturePath[0]);
     shader.setInt("uTexture", slot);
 
     // Game LOOP
@@ -71,6 +71,7 @@ int main () {
 
         renderer.draw(chunkManager, shader, deltaTime);
 
+        // chunkManager.update( {gCamera.getPosition().x, gCamera.getPosition().z} );
         GraphicsContext::update();
         fprintf(stdout, "avgFPS: %f\n", GraphicsContext::avgFPS());
     }

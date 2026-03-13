@@ -36,8 +36,7 @@ BlockType getBlock(const int x, const int y, const int z) {
 }
 
 // m_pos is glm::ivec2 (it contains x and y) so x = x and z = y
-Chunk::Chunk(const glm::ivec2 &chunkPos) : m_pos(chunkPos) {
-
+Chunk::Chunk(const glm::ivec2 &chunkPos) : isVisible(false), m_pos(chunkPos) {
     for (int x = 0; x < CHUNK_SIZE; x++) {
         const int worldX = m_pos.x + x;
 
@@ -45,7 +44,6 @@ Chunk::Chunk(const glm::ivec2 &chunkPos) : m_pos(chunkPos) {
             const int worldZ = m_pos.y + z;
 
             for (int y = 0; y < WORLD_HEIGHT; y++) {
-
                 m_blocks[x][y][z] = getBlock(worldX, y, worldZ);
             }
         }
@@ -90,7 +88,7 @@ void Chunk::updateMesh(Chunk* left, Chunk* right, Chunk* front, Chunk* back) {
 
                 // Left
                 if (x == 0) {
-                    if (!left || left->getBlockType(CHUNK_SIZE - 1, y, z) == BlockType::AIR)
+                    if (!left || left->getBlockType(CHUNK_SIZE - 1, y, z) == BlockType::AIR || !left->isVisible)
                         addFace(m_vertices, m_indices, glm::ivec3(x, y, z), FaceDirection::LEFT);
                 } else {
                     if (m_blocks[x - 1][y][z] == BlockType::AIR)
@@ -99,7 +97,7 @@ void Chunk::updateMesh(Chunk* left, Chunk* right, Chunk* front, Chunk* back) {
 
                 // Right
                 if (x == CHUNK_SIZE - 1) {
-                    if (!right || right->getBlockType(0, y, z) == BlockType::AIR)
+                    if (!right || right->getBlockType(0, y, z) == BlockType::AIR || !right->isVisible)
                         addFace(m_vertices, m_indices, glm::ivec3(x, y, z), FaceDirection::RIGHT);
                 } else {
                     if (m_blocks[x + 1][y][z] == BlockType::AIR)
@@ -108,7 +106,7 @@ void Chunk::updateMesh(Chunk* left, Chunk* right, Chunk* front, Chunk* back) {
 
                 // Front
                 if (z == CHUNK_SIZE - 1) {
-                    if (!front || front->getBlockType(x, y, 0) == BlockType::AIR)
+                    if (!front || front->getBlockType(x, y, 0) == BlockType::AIR || !front->isVisible)
                         addFace(m_vertices, m_indices, glm::ivec3(x, y, z), FaceDirection::FRONT);
                 } else {
                     if (m_blocks[x][y][z + 1] == BlockType::AIR)
@@ -117,7 +115,7 @@ void Chunk::updateMesh(Chunk* left, Chunk* right, Chunk* front, Chunk* back) {
 
                 // Back
                 if (z == 0) {
-                    if (!back || back->getBlockType(x, y, CHUNK_SIZE - 1) == BlockType::AIR)
+                    if (!back || back->getBlockType(x, y, CHUNK_SIZE - 1) == BlockType::AIR || !back->isVisible)
                         addFace(m_vertices, m_indices, glm::ivec3(x, y, z), FaceDirection::BACK);
                 } else {
                     if (m_blocks[x][y][z - 1] == BlockType::AIR)
