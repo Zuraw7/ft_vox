@@ -1,5 +1,4 @@
 #include <thread>
-#include <map>
 #include "ChunkManager.hpp"
 #include "Chunk.hpp"
 #include "fnl/fnl.hpp"
@@ -33,7 +32,7 @@ void ChunkManager::update(const glm::ivec2 &playerPos) {
     if (playerPos.x != m_playerPos.x || playerPos.y != m_playerPos.y) {
         m_playerPos = playerPos;
         // generateChunks();
-        // updateMeshes();
+        // updateMeshes(); // nowo widocznego chunka oraz tego co wcześniej był ostatni (teraz nie potrzebuje ściany)
         // uploadChunksToGPU(); // zmienić tak żeby tylko niewidoczne chunki były dodawane
         // moveChunksToCache();
         // removeChunks();
@@ -99,6 +98,12 @@ void ChunkManager::generateStartingChunks() {
 
 void ChunkManager::getChunksToRender() {
     m_chunksToRender.clear();
+    for (auto &entry: m_chunksInCache) {
+        if (entry.second) {
+            entry.second->isVisible = false;
+        }
+    }
+
     int playerX = m_playerPos.x / CHUNK_SIZE;
     int playerZ = m_playerPos.y / CHUNK_SIZE;
     for (auto &chunk : m_chunksInCache) {
@@ -115,7 +120,7 @@ void ChunkManager::updateMeshes() {
 
     std::vector<std::thread> threads;
     for (auto &chunk : m_chunksToRender) {
-        threads.emplace_back([this, &chunk]() {
+        threads.emplace_back([this, chunk]() {
             int chunkX = chunk->getPos().x / CHUNK_SIZE;
             int chunkZ = chunk->getPos().y / CHUNK_SIZE;
 
