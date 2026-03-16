@@ -71,7 +71,7 @@ int main () {
 
         renderer.draw(chunkManager, shader, deltaTime);
 
-        // chunkManager.update( {gCamera.getPosition().x, gCamera.getPosition().z} );
+        chunkManager.update( {gCamera.getPosition().x, gCamera.getPosition().z} );
         GraphicsContext::update();
         fprintf(stdout, "avgFPS: %f\n", GraphicsContext::avgFPS());
     }

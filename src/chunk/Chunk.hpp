@@ -60,9 +60,11 @@ public:
     ~Chunk() = default;
 
     bool isVisible;
+    bool isUploaded;
 
     void updateMesh(Chunk* left, Chunk* right, Chunk* front, Chunk* back);
     void uploadMesh();
+    void clearMesh();
 
     void draw(Shader &shader) const;
 

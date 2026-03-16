@@ -36,7 +36,7 @@ BlockType getBlock(const int x, const int y, const int z) {
 }
 
 // m_pos is glm::ivec2 (it contains x and y) so x = x and z = y
-Chunk::Chunk(const glm::ivec2 &chunkPos) : isVisible(false), m_pos(chunkPos) {
+Chunk::Chunk(const glm::ivec2 &chunkPos) : isVisible(false), isUploaded(false), m_pos(chunkPos) {
     for (int x = 0; x < CHUNK_SIZE; x++) {
         const int worldX = m_pos.x + x;
 
@@ -51,15 +51,20 @@ Chunk::Chunk(const glm::ivec2 &chunkPos) : isVisible(false), m_pos(chunkPos) {
 }
 
 Chunk::Chunk(Chunk &&other) noexcept
-    : m_pos(std::move(other.m_pos)),
+    : isVisible(other.isVisible),
+      isUploaded(other.isUploaded),
       m_vertices(std::move(other.m_vertices)),
       m_indices(std::move(other.m_indices)),
-      m_mesh(std::move(other.m_mesh)) {
+      m_mesh(std::move(other.m_mesh)),
+      m_pos(std::move(other.m_pos)) {
+    fprintf(stdout, "moving chunk\n");
 }
 
 Chunk &Chunk::operator=(Chunk &&other) noexcept {
     if (this == &other)
         return *this;
+    isVisible = other.isVisible;
+    isUploaded = other.isUploaded;
     m_pos = std::move(other.m_pos);
     m_vertices = std::move(other.m_vertices);
     m_indices = std::move(other.m_indices);
@@ -70,6 +75,7 @@ Chunk &Chunk::operator=(Chunk &&other) noexcept {
 void Chunk::updateMesh(Chunk* left, Chunk* right, Chunk* front, Chunk* back) {
     m_vertices.clear();
     m_indices.clear();
+    isUploaded = false;
 
     for (int x = 0; x < CHUNK_SIZE; x++) {
         for (int z = 0; z < CHUNK_SIZE; z++) {
@@ -130,12 +136,20 @@ void Chunk::uploadMesh() {
     m_mesh = std::make_unique<Mesh>(m_vertices, m_indices);
 }
 
+void Chunk::clearMesh() {
+    m_mesh.reset();
+    m_vertices.clear();
+    m_indices.clear();
+    m_mesh = nullptr;
+}
+
 void Chunk::draw(Shader &shader) const {
-    glm::mat4 model(1.0f);
-    model = glm::translate(model, glm::vec3(m_pos.x, 0, m_pos.y));
-    shader.setUniformMatrix4fv("uModel", model);
-    if (m_mesh)
+    if (m_mesh) {
+        glm::mat4 model(1.0f);
+        model = glm::translate(model, glm::vec3(m_pos.x, 0, m_pos.y));
+        shader.setUniformMatrix4fv("uModel", model);
         m_mesh->draw(shader);
+    }
 }
 
 glm::ivec2 Chunk::getPos() const {
