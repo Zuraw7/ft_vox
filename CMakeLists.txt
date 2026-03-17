@@ -20,6 +20,7 @@ add_executable(ft_vox
         src/shader/Shader.cpp
         src/textures/Texture2D.cpp
         src/textures/TextureManager.cpp
+        src/threadPool/ThreadPool.cpp
         src/utils/declarations.cpp
         src/utils/inputFunctions.cpp
         src/utils/utils.cpp
