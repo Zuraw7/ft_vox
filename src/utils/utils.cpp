@@ -1,6 +1,8 @@
 #include <glad/gl.h>
 #include <iostream>
 
+#include "../chunk/Chunk.hpp"
+
 void checkGLError()
 {
     GLenum err;

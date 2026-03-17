@@ -4,6 +4,7 @@
 #include "Chunk.hpp"
 #include "fnl/fnl.hpp"
 #include "../object/Mesh.hpp"
+#include "../utils/utils.hpp"
 
 std::unique_ptr<FastNoiseLite> gContinentalNoise;
 std::unique_ptr<FastNoiseLite> gErosionNoise;
@@ -23,8 +24,8 @@ void ChunkManager::drawChunks(Shader &shader) const {
 }
 
 void ChunkManager::update(const glm::ivec2 &playerPos) {
-    glm::ivec2 oldChunk = m_playerPos / CHUNK_SIZE;
-    glm::ivec2 newChunk = playerPos / CHUNK_SIZE;
+    glm::ivec2 oldChunk = worldToChunk(m_playerPos);
+    glm::ivec2 newChunk = worldToChunk(playerPos);
 
     if (newChunk != oldChunk) {
         removeFarChunksMeshes();
@@ -72,10 +73,10 @@ void ChunkManager::setupNoises(int worldSeed) {
 }
 
 void ChunkManager::calculateStartingChunk(const int x, const int startingZ) {
-    const int chunkX = x * CHUNK_SIZE;
+    const int chunkX = chunkToWorld(x);
     std::vector<std::pair<glm::ivec2, std::unique_ptr<Chunk>>> localChunks;
     for (int z = startingZ - CACHE_DISTANCE; z <= startingZ + CACHE_DISTANCE; z++) {
-        glm::ivec2 chunkPos(chunkX, z * CHUNK_SIZE);
+        glm::ivec2 chunkPos(chunkX, chunkToWorld(z));
         localChunks.emplace_back(glm::ivec2(x, z), std::make_unique<Chunk>(chunkPos));
     }
     std::lock_guard<std::mutex> lock(m_chunksMutex);
@@ -84,8 +85,8 @@ void ChunkManager::calculateStartingChunk(const int x, const int startingZ) {
 }
 
 void ChunkManager::generateStartingChunks() {
-    int startingX = m_playerPos.x / CHUNK_SIZE;
-    int startingZ = m_playerPos.y / CHUNK_SIZE;
+    int startingX = worldToChunk(m_playerPos.x);
+    int startingZ = worldToChunk(m_playerPos.y);
     std::vector<std::thread> threads;
     for (int x = startingX - CACHE_DISTANCE; x <= startingX + CACHE_DISTANCE; x++) {
         threads.emplace_back([this, x, startingZ]() {
@@ -101,8 +102,8 @@ void ChunkManager::updateStartingMeshes() {
     std::vector<std::thread> threads;
     for (auto &chunk : m_chunksToRender) {
         threads.emplace_back([this, chunk]() {
-            int chunkX = chunk->getPos().x / CHUNK_SIZE;
-            int chunkZ = chunk->getPos().y / CHUNK_SIZE;
+            int chunkX = worldToChunk(chunk->getPos().x);
+            int chunkZ = worldToChunk(chunk->getPos().y);
 
             auto it = m_chunksInCache.find(glm::ivec2(chunkX - 1, chunkZ));
             Chunk* left = (it != m_chunksInCache.end()) ? it->second.get() : nullptr;
@@ -132,8 +133,8 @@ void ChunkManager::getStartingChunksToRender() {
         }
     }
 
-    int playerX = m_playerPos.x / CHUNK_SIZE;
-    int playerZ = m_playerPos.y / CHUNK_SIZE;
+    int playerX = worldToChunk(m_playerPos.x);
+    int playerZ = worldToChunk(m_playerPos.y);
 
     for (int r = 0; r <= RENDER_DISTANCE; r++) {
         if (r == 0) {
@@ -169,8 +170,8 @@ void ChunkManager::uploadChunksToGPU() {
 }
 
 void ChunkManager::prepareChunksToGenerate() {
-    int playerX = m_playerPos.x / CHUNK_SIZE;
-    int playerZ = m_playerPos.y / CHUNK_SIZE;
+    int playerX = worldToChunk(m_playerPos.x);
+    int playerZ = worldToChunk(m_playerPos.y);
 
     for (int x = playerX - CACHE_DISTANCE; x <= playerX + CACHE_DISTANCE; x++) {
         for (int z = playerZ - CACHE_DISTANCE; z <= playerZ + CACHE_DISTANCE; z++) {
@@ -189,7 +190,7 @@ void ChunkManager::generateChunksAroundPlayer() {
         glm::ivec2 coord = m_chunksToGenerate.back();
         m_chunksToGenerate.pop_back();
 
-        glm::ivec2 worldPos(coord.x * CHUNK_SIZE, coord.y * CHUNK_SIZE);
+        glm::ivec2 worldPos(chunkToWorld(coord));
         m_chunksInCache.emplace(coord, std::make_unique<Chunk>(worldPos));
         m_chunksToMakeVisible.emplace_back(coord);
 
@@ -206,8 +207,8 @@ void ChunkManager::tryAddChunk(int x, int z) {
 }
 
 void ChunkManager::removeFarChunksMeshes() {
-    int playerX = m_playerPos.x / CHUNK_SIZE;
-    int playerZ = m_playerPos.y / CHUNK_SIZE;
+    int playerX = worldToChunk(m_playerPos.x);
+    int playerZ = worldToChunk(m_playerPos.y);
 
     for (auto& chunk: m_chunksInCache) {
         int dx = std::abs(chunk.first.x - playerX);
@@ -230,8 +231,8 @@ void ChunkManager::removeFarChunksMeshes() {
 }
 
 void ChunkManager::removeFarChunksFromCache() {
-    int playerX = m_playerPos.x / CHUNK_SIZE;
-    int playerZ = m_playerPos.y / CHUNK_SIZE;
+    int playerX = worldToChunk(m_playerPos.x);
+    int playerZ = worldToChunk(m_playerPos.y);
 
     for (auto it = m_chunksInCache.begin(); it != m_chunksInCache.end(); ) {
         int dx = std::abs(it->first.x - playerX);
@@ -252,14 +253,14 @@ void ChunkManager::removeFarChunksFromCache() {
 }
 
 void ChunkManager::enqueueVisibleCachedChunks() {
-    int playerX = m_playerPos.x / CHUNK_SIZE;
-    int playerZ = m_playerPos.y / CHUNK_SIZE;
+    int playerX = worldToChunk(m_playerPos.x);
+    int playerZ = worldToChunk(m_playerPos.y);
 
     for (int x = playerX - RENDER_DISTANCE; x <= playerX + RENDER_DISTANCE; x++) {
         for (int z = playerZ - RENDER_DISTANCE; z <= playerZ + RENDER_DISTANCE; z++) {
             auto it = m_chunksInCache.find({x, z});
             if (it != m_chunksInCache.end() && !it->second->isVisible)
-                m_chunksToMakeVisible.emplace_back(glm::ivec2(x, z));
+                m_chunksToMakeVisible.emplace_back(x, z);
         }
     }
 }
@@ -275,8 +276,8 @@ void ChunkManager::flushVisibleChunks() {
     if (m_chunksToMakeVisible.empty())
         return;
 
-    int playerX = m_playerPos.x / CHUNK_SIZE;
-    int playerZ = m_playerPos.y / CHUNK_SIZE;
+    int playerX = worldToChunk(m_playerPos.x);
+    int playerZ = worldToChunk(m_playerPos.y);
 
     for (auto it = m_chunksToMakeVisible.begin(); it != m_chunksToMakeVisible.end();) {
         int dx = std::abs(it->x - playerX);

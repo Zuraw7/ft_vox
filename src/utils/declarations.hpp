@@ -18,6 +18,7 @@ extern Resolution QHD;
 
 constexpr int MAX_PER_FRAME = 4;
 
+constexpr int CHUNK_SIZE = 16;
 constexpr int WORLD_HEIGHT = 256;
 constexpr int WORLD_SIZE = 16384;
 constexpr int RENDER_DISTANCE = 5;

@@ -11,8 +11,6 @@ class Shader;
 class Mesh;
 struct Vertex;
 
-constexpr int CHUNK_SIZE = 16;
-
 const std::vector<std::pair<float, float>> continentalPoints {
             {-1.0f, 50},
             {-0.5f, 60},
