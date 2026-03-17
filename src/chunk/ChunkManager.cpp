@@ -31,7 +31,7 @@ void ChunkManager::update(const glm::ivec2 &playerPos) {
         removeFarChunksMeshes();
         removeFarChunksFromCache();
         m_playerPos = playerPos;
-        prepareChunksToGenerate();
+        prepareChunksToGenerate(oldChunk);
         enqueueVisibleCachedChunks();
     }
 
@@ -169,16 +169,23 @@ void ChunkManager::uploadChunksToGPU() {
     }
 }
 
-void ChunkManager::prepareChunksToGenerate() {
+void ChunkManager::prepareChunksToGenerate(const glm::ivec2 &oldChunk) {
+    glm::ivec2 delta = worldToChunk(m_playerPos) - oldChunk;
     int playerX = worldToChunk(m_playerPos.x);
     int playerZ = worldToChunk(m_playerPos.y);
 
-    for (int x = playerX - CACHE_DISTANCE; x <= playerX + CACHE_DISTANCE; x++) {
+    if (delta.x != 0) {
+        int newEdgeX = playerX + (delta.x > 0 ? CACHE_DISTANCE : -CACHE_DISTANCE);
         for (int z = playerZ - CACHE_DISTANCE; z <= playerZ + CACHE_DISTANCE; z++) {
-            glm::ivec2 coord(x, z);
-            if (m_chunksInCache.find(coord) == m_chunksInCache.end()) {
-                m_chunksToGenerate.push_back(coord);
-            }
+            if (m_chunksInCache.find({newEdgeX, z}) == m_chunksInCache.end())
+                m_chunksToGenerate.emplace_back(newEdgeX, z);
+        }
+    }
+    if (delta.y != 0) {
+        int newEdgeZ = playerZ + (delta.y > 0 ? CACHE_DISTANCE : -CACHE_DISTANCE);
+        for (int x = playerX - CACHE_DISTANCE; x <= playerX + CACHE_DISTANCE; x++) {
+            if (m_chunksInCache.find({x, newEdgeZ}) == m_chunksInCache.end())
+                m_chunksToGenerate.emplace_back(x, newEdgeZ);
         }
     }
 }

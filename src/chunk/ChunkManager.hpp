@@ -49,7 +49,7 @@ private:
     // On chunk move
     void removeFarChunksMeshes();
     void removeFarChunksFromCache();
-    void prepareChunksToGenerate();
+    void prepareChunksToGenerate(const glm::ivec2 &oldChunk);
     void generateChunksAroundPlayer();
 
     // Per frame
