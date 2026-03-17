@@ -1,4 +1,3 @@
-#include <thread>
 #include <algorithm>
 #include "ChunkManager.hpp"
 #include "Chunk.hpp"
@@ -36,6 +35,7 @@ void ChunkManager::update(const glm::ivec2 &playerPos) {
     }
 
     generateChunksAroundPlayer();
+    flushCompletedChunks();
     flushVisibleChunks();
     uploadChunksToGPU();
 }
@@ -87,21 +87,17 @@ void ChunkManager::calculateStartingChunk(const int x, const int startingZ) {
 void ChunkManager::generateStartingChunks() {
     int startingX = worldToChunk(m_playerPos.x);
     int startingZ = worldToChunk(m_playerPos.y);
-    std::vector<std::thread> threads;
     for (int x = startingX - CACHE_DISTANCE; x <= startingX + CACHE_DISTANCE; x++) {
-        threads.emplace_back([this, x, startingZ]() {
+        m_threadPool.enqueue([this, x, startingZ]() {
             this->calculateStartingChunk(x, startingZ);
         });
     }
-    for (auto &t: threads)
-        t.join();
+    m_threadPool.waitAll();
 }
 
 void ChunkManager::updateStartingMeshes() {
-
-    std::vector<std::thread> threads;
     for (auto &chunk : m_chunksToRender) {
-        threads.emplace_back([this, chunk]() {
+        m_threadPool.enqueue([this, chunk]() {
             int chunkX = worldToChunk(chunk->getPos().x);
             int chunkZ = worldToChunk(chunk->getPos().y);
 
@@ -120,9 +116,7 @@ void ChunkManager::updateStartingMeshes() {
             chunk->updateMesh(left, right, front, back);
         });
     }
-
-    for (auto &t : threads)
-        t.join();
+    m_threadPool.waitAll();
 }
 
 void ChunkManager::getStartingChunksToRender() {
@@ -196,11 +190,11 @@ void ChunkManager::generateChunksAroundPlayer() {
     while (!m_chunksToGenerate.empty() && generatedThisFrame < MAX_PER_FRAME) {
         glm::ivec2 coord = m_chunksToGenerate.back();
         m_chunksToGenerate.pop_back();
-
-        glm::ivec2 worldPos(chunkToWorld(coord));
-        m_chunksInCache.emplace(coord, std::make_unique<Chunk>(worldPos));
-        m_chunksToMakeVisible.emplace_back(coord);
-
+        m_threadPool.enqueue([this, coord] {
+            auto chunk = std::make_unique<Chunk>(chunkToWorld(coord));
+            std::unique_lock<std::mutex> lock(m_chunksMutex);
+            m_generatedChunks.push({coord, std::move(chunk)});
+        });
         generatedThisFrame++;
     }
 }
@@ -330,5 +324,21 @@ void ChunkManager::flushVisibleChunks() {
         refreshNeighbourBorder(back, getChunk(it->x - 1, it->y - 1), getChunk(it->x + 1, it->y - 1), chunk, getChunk(it->x, it->y - 2));
 
         it = m_chunksToMakeVisible.erase(it);
+    }
+}
+
+void ChunkManager::flushCompletedChunks() {
+    if (m_generatedChunks.empty())
+        return;
+
+    while (!m_generatedChunks.empty()) {
+        std::unique_lock<std::mutex> lock(m_chunksMutex);
+        auto chunkInfo = std::move(m_generatedChunks.front());
+        m_generatedChunks.pop();
+        lock.unlock();
+        if (m_chunksInCache.find(chunkInfo.first) == m_chunksInCache.end()) {
+            m_chunksInCache[chunkInfo.first] = std::move(chunkInfo.second);
+            m_chunksToMakeVisible.emplace_back(chunkInfo.first);
+        }
     }
 }

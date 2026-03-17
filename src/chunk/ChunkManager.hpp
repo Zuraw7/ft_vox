@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "glm/vec2.hpp"
+#include "../threadPool/ThreadPool.hpp"
 
 enum class FaceDirection;
 enum class BlockType : uint8_t;
@@ -31,9 +32,11 @@ private:
     glm::ivec2 m_playerPos;
     std::unordered_map<glm::ivec2, std::unique_ptr<Chunk>, ivec2Hash> m_chunksInCache;
     std::vector<Chunk *> m_chunksToRender;
+    std::queue<std::pair<glm::ivec2, std::unique_ptr<Chunk>>> m_generatedChunks;
     std::vector<glm::ivec2> m_chunksToMakeVisible;
     std::vector<glm::ivec2> m_chunksToGenerate;
     std::mutex m_chunksMutex;
+    ThreadPool m_threadPool;
 
     // Methods to call on create
     void setupNoises(int worldSeed);
@@ -55,6 +58,7 @@ private:
     // Per frame
     void enqueueVisibleCachedChunks();
     void flushVisibleChunks();
+    void flushCompletedChunks();
 };
 
 #endif //FT_VOX_CHUNKMANAGER_HPP

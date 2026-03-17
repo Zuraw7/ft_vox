@@ -16,15 +16,18 @@ public:
     ThreadPool &operator=(const ThreadPool &other) = delete;
     ThreadPool &operator=(ThreadPool &&other) noexcept = delete;
 
-    void enqueue(std::function<void()> f);
+    void enqueue(std::function<void()> func);
+    void waitAll();
 
 private:
     unsigned int m_maxThreads;
     std::atomic<bool> m_shouldStop;
+    std::atomic<int> m_runningThreads;
     std::vector<std::thread> m_threads;
     std::queue<std::function<void()>> m_queue;
     std::mutex m_queueMutex;
     std::condition_variable m_condVar;
+    std::condition_variable m_waitAllCondVar;
 };
 
 
