@@ -73,6 +73,7 @@ Chunk &Chunk::operator=(Chunk &&other) noexcept {
 }
 
 void Chunk::updateMesh(Chunk* left, Chunk* right, Chunk* front, Chunk* back) {
+    std::unique_lock<std::mutex> lock(m_mutex);
     m_vertices.clear();
     m_indices.clear();
     isUploaded = false;
@@ -133,10 +134,12 @@ void Chunk::updateMesh(Chunk* left, Chunk* right, Chunk* front, Chunk* back) {
 }
 
 void Chunk::uploadMesh() {
+    std::unique_lock<std::mutex> lock(m_mutex);
     m_mesh = std::make_unique<Mesh>(m_vertices, m_indices);
 }
 
 void Chunk::clearMesh() {
+    std::unique_lock<std::mutex> lock(m_mutex);
     m_mesh.reset();
     m_vertices.clear();
     m_indices.clear();

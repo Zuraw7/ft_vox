@@ -24,7 +24,9 @@ ThreadPool::ThreadPool() : m_maxThreads(std::thread::hardware_concurrency()),
 }
 
 ThreadPool::~ThreadPool() {
+    std::unique_lock<std::mutex> lock(m_queueMutex);
     m_shouldStop = true;
+    lock.unlock();
     m_condVar.notify_all();
     for (auto& thread : m_threads) {
         thread.join();

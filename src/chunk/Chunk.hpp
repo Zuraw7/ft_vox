@@ -2,6 +2,7 @@
 #define FT_VOX_CHUNK_HPP
 
 #include <memory>
+#include <mutex>
 #include <vector>
 #include <glm/vec2.hpp>
 #include <glm/ext/matrix_transform.hpp>
@@ -76,6 +77,7 @@ private:
     std::vector<Vertex> m_vertices;
     std::vector<unsigned int> m_indices;
     std::unique_ptr<Mesh> m_mesh;
+    std::mutex m_mutex;
 
     void addFace(std::vector<Vertex> &vertices, std::vector<unsigned int> &indices, glm::ivec3 blockPos, FaceDirection dir);
 };

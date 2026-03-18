@@ -32,6 +32,8 @@ private:
     glm::ivec2 m_playerPos;
     std::unordered_map<glm::ivec2, std::unique_ptr<Chunk>, ivec2Hash> m_chunksInCache;
     std::vector<Chunk *> m_chunksToRender;
+    std::queue<Chunk *> m_updatedChunks;
+    std::mutex m_updatedChunksMutex;
     std::queue<std::pair<glm::ivec2, std::unique_ptr<Chunk>>> m_generatedChunks;
     std::vector<glm::ivec2> m_chunksToMakeVisible;
     std::vector<glm::ivec2> m_chunksToGenerate;
@@ -59,6 +61,8 @@ private:
     void enqueueVisibleCachedChunks();
     void flushVisibleChunks();
     void flushCompletedChunks();
+    void flushUpdatedChunks();
+
 };
 
 #endif //FT_VOX_CHUNKMANAGER_HPP

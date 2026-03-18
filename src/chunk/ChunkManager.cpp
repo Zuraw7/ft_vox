@@ -37,6 +37,7 @@ void ChunkManager::update(const glm::ivec2 &playerPos) {
     generateChunksAroundPlayer();
     flushCompletedChunks();
     flushVisibleChunks();
+    flushUpdatedChunks();
     uploadChunksToGPU();
 }
 
@@ -311,17 +312,40 @@ void ChunkManager::flushVisibleChunks() {
             continue;
         }
 
-        chunk->updateMesh(left, right, front, back);
+        m_threadPool.enqueue([this, chunk, left, right, front, back] {
+            chunk->updateMesh(left, right, front, back);
+            {
+                std::unique_lock<std::mutex> lock(m_updatedChunksMutex);
+                m_updatedChunks.emplace(chunk);
+            }
+        });
 
-        if (!chunk->isVisible) {
-            chunk->isVisible = true;
-            m_chunksToRender.emplace_back(chunk);
-        }
+        Chunk *leftNeiLeft = getChunk(it->x - 2, it->y);
+        Chunk *leftNeiFront = getChunk(it->x - 1, it->y + 1);
+        Chunk *leftNeiBack = getChunk(it->x - 1, it->y - 1);
+        m_threadPool.enqueue([left, chunk, leftNeiLeft, leftNeiFront, leftNeiBack] {
+            refreshNeighbourBorder(left, leftNeiLeft, chunk, leftNeiFront, leftNeiBack);
+        });
+        Chunk *rightNeiRight = getChunk(it->x + 2, it->y);
+        Chunk *rightNeiFront = getChunk(it->x + 1, it->y + 1);
+        Chunk *rightNeiBack  = getChunk(it->x + 1, it->y - 1);
+        m_threadPool.enqueue([right, chunk, rightNeiRight, rightNeiFront, rightNeiBack] {
+            refreshNeighbourBorder(right, chunk, rightNeiRight, rightNeiFront, rightNeiBack);
+        });
 
-        refreshNeighbourBorder(left, getChunk(it->x - 2, it->y), chunk, getChunk(it->x - 1, it->y + 1), getChunk(it->x - 1, it->y - 1));
-        refreshNeighbourBorder(right, chunk, getChunk(it->x + 2, it->y), getChunk(it->x + 1, it->y + 1), getChunk(it->x + 1, it->y - 1));
-        refreshNeighbourBorder(front, getChunk(it->x - 1, it->y + 1), getChunk(it->x + 1, it->y + 1), getChunk(it->x, it->y + 2), chunk);
-        refreshNeighbourBorder(back, getChunk(it->x - 1, it->y - 1), getChunk(it->x + 1, it->y - 1), chunk, getChunk(it->x, it->y - 2));
+        Chunk *frontNeiLeft  = getChunk(it->x - 1, it->y + 1);
+        Chunk *frontNeiRight = getChunk(it->x + 1, it->y + 1);
+        Chunk *frontNeiFront = getChunk(it->x, it->y + 2);
+        m_threadPool.enqueue([front, frontNeiLeft, frontNeiRight, frontNeiFront, chunk] {
+            refreshNeighbourBorder(front, frontNeiLeft, frontNeiRight, frontNeiFront, chunk);
+        });
+
+        Chunk *backNeiLeft  = getChunk(it->x - 1, it->y - 1);
+        Chunk *backNeiRight = getChunk(it->x + 1, it->y - 1);
+        Chunk *backNeiBack  = getChunk(it->x, it->y - 2);
+        m_threadPool.enqueue([back, backNeiLeft, backNeiRight, backNeiBack, chunk] {
+            refreshNeighbourBorder(back, backNeiLeft, backNeiRight, backNeiBack, chunk);
+        });
 
         it = m_chunksToMakeVisible.erase(it);
     }
@@ -340,5 +364,19 @@ void ChunkManager::flushCompletedChunks() {
             m_chunksInCache[chunkInfo.first] = std::move(chunkInfo.second);
             m_chunksToMakeVisible.emplace_back(chunkInfo.first);
         }
+    }
+}
+
+void ChunkManager::flushUpdatedChunks() {
+    std::unique_lock<std::mutex> lockUpdated(m_updatedChunksMutex);
+    if (m_updatedChunks.empty())
+        return;
+    while (!m_updatedChunks.empty()) {
+        Chunk *chunk = m_updatedChunks.front();
+        if (!chunk->isVisible) {
+            chunk->isVisible = true;
+            m_chunksToRender.emplace_back(chunk);
+        }
+        m_updatedChunks.pop();
     }
 }
