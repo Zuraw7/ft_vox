@@ -20,11 +20,16 @@ add_executable(ft_vox
         src/shader/Shader.cpp
         src/textures/Texture2D.cpp
         src/textures/TextureManager.cpp
+        src/threadPool/ThreadPool.cpp
         src/utils/declarations.cpp
         src/utils/inputFunctions.cpp
         src/utils/utils.cpp
         include/glad/gl.c
         include/stb/stb_image.c
+)
+
+set_target_properties(ft_vox PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/exec
 )
 
 target_include_directories(ft_vox
