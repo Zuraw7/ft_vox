@@ -28,6 +28,10 @@ add_executable(ft_vox
         include/stb/stb_image.c
 )
 
+set_target_properties(ft_vox PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/exec
+)
+
 target_include_directories(ft_vox
     PRIVATE
         ${CMAKE_SOURCE_DIR}/include
