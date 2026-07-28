@@ -94,7 +94,7 @@ void Chunk::updateMesh(Chunk* left, Chunk* right, Chunk* front, Chunk* back) {
 
                 // Left
                 if (x == 0) {
-                    if (!left || left->getBlockType(CHUNK_SIZE - 1, y, z) == BlockType::AIR || !left->isVisible)
+                    if (!left || left->getBlockType(CHUNK_SIZE - 1, y, z) == BlockType::AIR)
                         addFace(m_vertices, m_indices, glm::ivec3(x, y, z), FaceDirection::LEFT);
                 } else {
                     if (m_blocks[x - 1][y][z] == BlockType::AIR)
@@ -103,7 +103,7 @@ void Chunk::updateMesh(Chunk* left, Chunk* right, Chunk* front, Chunk* back) {
 
                 // Right
                 if (x == CHUNK_SIZE - 1) {
-                    if (!right || right->getBlockType(0, y, z) == BlockType::AIR || !right->isVisible)
+                    if (!right || right->getBlockType(0, y, z) == BlockType::AIR)
                         addFace(m_vertices, m_indices, glm::ivec3(x, y, z), FaceDirection::RIGHT);
                 } else {
                     if (m_blocks[x + 1][y][z] == BlockType::AIR)
@@ -112,7 +112,7 @@ void Chunk::updateMesh(Chunk* left, Chunk* right, Chunk* front, Chunk* back) {
 
                 // Front
                 if (z == CHUNK_SIZE - 1) {
-                    if (!front || front->getBlockType(x, y, 0) == BlockType::AIR || !front->isVisible)
+                    if (!front || front->getBlockType(x, y, 0) == BlockType::AIR)
                         addFace(m_vertices, m_indices, glm::ivec3(x, y, z), FaceDirection::FRONT);
                 } else {
                     if (m_blocks[x][y][z + 1] == BlockType::AIR)
@@ -121,7 +121,7 @@ void Chunk::updateMesh(Chunk* left, Chunk* right, Chunk* front, Chunk* back) {
 
                 // Back
                 if (z == 0) {
-                    if (!back || back->getBlockType(x, y, CHUNK_SIZE - 1) == BlockType::AIR || !back->isVisible)
+                    if (!back || back->getBlockType(x, y, CHUNK_SIZE - 1) == BlockType::AIR)
                         addFace(m_vertices, m_indices, glm::ivec3(x, y, z), FaceDirection::BACK);
                 } else {
                     if (m_blocks[x][y][z - 1] == BlockType::AIR)

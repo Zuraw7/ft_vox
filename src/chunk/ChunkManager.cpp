@@ -5,6 +5,9 @@
 #include "../object/Mesh.hpp"
 #include "../utils/utils.hpp"
 
+// Self first, then the four side neighbours whose border faces depend on this chunk's data.
+static constexpr glm::ivec2 neighbourOffsets[] = {{0, 0}, {-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+
 std::unique_ptr<FastNoiseLite> gContinentalNoise;
 std::unique_ptr<FastNoiseLite> gErosionNoise;
 std::unique_ptr<FastNoiseLite> gPeaksNoise;
@@ -261,37 +264,30 @@ void ChunkManager::enqueueVisibleCachedChunks() {
         for (int z = playerZ - RENDER_DISTANCE; z <= playerZ + RENDER_DISTANCE; z++) {
             auto it = m_chunksInCache.find({x, z});
             if (it != m_chunksInCache.end() && !it->second->isVisible)
-                m_chunksToMakeVisible.emplace_back(x, z);
+                m_dirtyMeshes.insert({x, z});
         }
     }
 }
 
-static void refreshNeighbourBorder(Chunk *neighbour, Chunk *nLeft, Chunk *nRight, Chunk *nFront, Chunk *nBack) {
-    if (!neighbour || !neighbour->isVisible)
-        return;
-    neighbour->updateMesh(nLeft, nRight, nFront, nBack);
-    neighbour->isUploaded = false;
-}
-
 void ChunkManager::flushVisibleChunks() {
-    if (m_chunksToMakeVisible.empty())
+    if (m_dirtyMeshes.empty())
         return;
 
     int playerX = worldToChunk(m_playerPos.x);
     int playerZ = worldToChunk(m_playerPos.y);
 
-    for (auto it = m_chunksToMakeVisible.begin(); it != m_chunksToMakeVisible.end();) {
+    for (auto it = m_dirtyMeshes.begin(); it != m_dirtyMeshes.end();) {
         int dx = std::abs(it->x - playerX);
         int dz = std::abs(it->y - playerZ);
 
         if (dx > RENDER_DISTANCE || dz > RENDER_DISTANCE) {
-            it = m_chunksToMakeVisible.erase(it);
+            it = m_dirtyMeshes.erase(it);
             continue;
         }
 
         auto cacheIt = m_chunksInCache.find(*it);
         if (cacheIt == m_chunksInCache.end()) {
-            it = m_chunksToMakeVisible.erase(it);
+            it = m_dirtyMeshes.erase(it);
             continue;
         }
 
@@ -318,12 +314,7 @@ void ChunkManager::flushVisibleChunks() {
             m_chunksToRender.emplace_back(chunk);
         }
 
-        refreshNeighbourBorder(left, getChunk(it->x - 2, it->y), chunk, getChunk(it->x - 1, it->y + 1), getChunk(it->x - 1, it->y - 1));
-        refreshNeighbourBorder(right, chunk, getChunk(it->x + 2, it->y), getChunk(it->x + 1, it->y + 1), getChunk(it->x + 1, it->y - 1));
-        refreshNeighbourBorder(front, getChunk(it->x - 1, it->y + 1), getChunk(it->x + 1, it->y + 1), getChunk(it->x, it->y + 2), chunk);
-        refreshNeighbourBorder(back, getChunk(it->x - 1, it->y - 1), getChunk(it->x + 1, it->y - 1), chunk, getChunk(it->x, it->y - 2));
-
-        it = m_chunksToMakeVisible.erase(it);
+        it = m_dirtyMeshes.erase(it);
     }
 }
 
@@ -338,7 +329,8 @@ void ChunkManager::flushCompletedChunks() {
         lock.unlock();
         if (m_chunksInCache.find(chunkInfo.first) == m_chunksInCache.end()) {
             m_chunksInCache[chunkInfo.first] = std::move(chunkInfo.second);
-            m_chunksToMakeVisible.emplace_back(chunkInfo.first);
+            for (const auto &offset: neighbourOffsets)
+                m_dirtyMeshes.insert(chunkInfo.first + offset);
         }
     }
 }

@@ -1,5 +1,6 @@
 #ifndef FT_VOX_CHUNKMANAGER_HPP
 #define FT_VOX_CHUNKMANAGER_HPP
+#include <glm/ext/vector_int2.hpp>
 #include <memory>
 #include <mutex>
 #include <unordered_map>
@@ -33,7 +34,7 @@ private:
     std::unordered_map<glm::ivec2, std::unique_ptr<Chunk>, ivec2Hash> m_chunksInCache;
     std::vector<Chunk *> m_chunksToRender;
     std::queue<std::pair<glm::ivec2, std::unique_ptr<Chunk>>> m_generatedChunks;
-    std::vector<glm::ivec2> m_chunksToMakeVisible;
+    std::unordered_set<glm::ivec2, ivec2Hash> m_dirtyMeshes;
     std::vector<glm::ivec2> m_chunksToGenerate;
     std::mutex m_chunksMutex;
     ThreadPool m_threadPool;
