@@ -319,14 +319,15 @@ void ChunkManager::flushVisibleChunks() {
 }
 
 void ChunkManager::flushCompletedChunks() {
-    if (m_generatedChunks.empty())
-        return;
+    std::queue<std::pair<glm::ivec2, std::unique_ptr<Chunk>>> completed;
+    {
+        std::lock_guard<std::mutex> lock(m_chunksMutex);
+        completed.swap(m_generatedChunks);
+    }
 
-    while (!m_generatedChunks.empty()) {
-        std::unique_lock<std::mutex> lock(m_chunksMutex);
-        auto chunkInfo = std::move(m_generatedChunks.front());
-        m_generatedChunks.pop();
-        lock.unlock();
+    while (!completed.empty()) {
+        auto chunkInfo = std::move(completed.front());
+        completed.pop();
         if (m_chunksInCache.find(chunkInfo.first) == m_chunksInCache.end()) {
             m_chunksInCache[chunkInfo.first] = std::move(chunkInfo.second);
             for (const auto &offset: neighbourOffsets)
